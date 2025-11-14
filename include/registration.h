@@ -1,6 +1,7 @@
 #ifndef REGISTRATION_H
 #define REGISTRATION_H
 #include <gtk/gtk.h>
+#include "widgets.h"
 
 typedef struct{
     GtkWidget *name_entry;
