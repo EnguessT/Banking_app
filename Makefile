@@ -9,8 +9,8 @@ OBJ_DIR = obj
 INC_DIR = include
 
 # Source and object files
-SOURCES = $(SRC_DIR)/main.c $(SRC_DIR)/main_window.c
-OBJECTS = $(OBJ_DIR)/main.o $(OBJ_DIR)/main_window.o
+SOURCES = $(SRC_DIR)/main.c $(SRC_DIR)/main_window.c $(SRC_DIR)/widgets.c
+OBJECTS = $(OBJ_DIR)/main.o $(OBJ_DIR)/main_window.o $(OBJ_DIR)/widgets.o
 TARGET = final
 
 # Default target

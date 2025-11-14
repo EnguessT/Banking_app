@@ -1,5 +1,5 @@
 #include"main_window.h"
-#include <widgets.h>
+#include "widgets.h"
 #include <gtk/gtk.h>
 
 
@@ -16,7 +16,6 @@ gboolean on_link_clicked(GtkLinkButton *button, gpointer user_data) {
 
     return TRUE;  // Prevent default URI opening
 }
-
 
 //extract the text and call your open_connect_window():
 void on_login_clicked(GtkWidget *button, gpointer user_data) {
