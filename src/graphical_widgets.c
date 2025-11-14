@@ -72,6 +72,76 @@ GtkWidget* set_image(const char* filename, int width, int height) {
     return image;
 }
 
+GtkWidget* create_entry(const gchar *entry_label) {
+    GtkWidget *entry_name = gtk_entry_new();
+    gtk_entry_set_placeholder_text(GTK_ENTRY(username_entry), entry_label);
+    gtk_widget_set_name(entry_name, "entry");
+    GtkCssProvider *user_provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(user_provider,
+         "#entry {"
+        " background-color: white;"
+        " border-radius: 10px;"
+        " padding: 8px;"
+        " border: 1px solid #ccc;"
+        " }",
+        -1, NULL);
+
+    return entry_name;
+}
+
+GtkWidget* create_button(const gchar *button_label) {
+    GtkWidget *button = gtk_button_new_with_label(button_label);
+    gtk_widget_set_name(button, "button");
+    GtkCssProvider *login_provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(login_provider,
+        "#button {"
+        " background-color: #ffffff;"
+        " color: #ff6f61;"
+        " font-weight: bold;"
+        " border-radius: 20px;"
+        " padding: 10px 20px;"
+        " border: none;"
+        " }"
+        "#login-button:hover {"
+        " background-color: #0165BD;"
+        " color: white;"
+        " }",
+        -1, NULL);
+
+    return button;
+}
+
+GtkWidget* create_link_button(const gchar *link_label){
+    const gchar *link_label = link_label;
+    GtkWidget *link_button = gtk_link_button_new_with_label("about:blank", link_label);
+    g_signal_connect(link_button, "activate-link", G_CALLBACK(on_link_clicked), NULL);
+    gtk_widget_set_name(link_button, "passwort-style");
+
+    // CSS provider
+    GtkCssProvider *link_provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(link_provider,
+        "#passwort-style.link, "
+        "#passwort-style.link:link, "
+        "#passwort-style.link:visited, "
+        "#passwort-style.link:hover {"
+        "  font-family: 'Sans';"  
+        "  font-size: 12pt;"
+        "  font-weight: bold;"
+        "  color: gray;"
+        "  text-decoration: underline;"
+        "  background-color: transparent;"
+        "  border: none;"
+        "}", -1, NULL);
+
+    // Apply provider
+    GtkStyleContext *pass_context = gtk_widget_get_style_context(link_button);
+    gtk_style_context_add_provider(pass_context,
+                                GTK_STYLE_PROVIDER(link_provider),
+                                GTK_STYLE_PROVIDER_PRIORITY_USER);
+
+    return link_button;
+}
+
 GtkWidget* create_main_window(void){
 
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -110,19 +180,55 @@ GtkWidget* create_main_window(void){
     //vertical right box container for user inputs
     GtkWidget *right_box = gtk_box_new(1, 5);
     gtk_widget_set_name(right_box, "right-box");
-    //create an image for profile image
-    GtkWidget *profile_image = set_image("images/profile.png", 90, 90);
-
-    gchar *u_label = "<b><span foreground=\"black\" size=\'x-large\'>USER  LOGIN</span></b>";
-    GtkWidget *user_label = set_label(u_label);
-
-    gtk_box_pack_start(GTK_BOX(right_box), profile_image, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(right_box), user_label, FALSE, FALSE, 0);
-
-
 
     //set a backgroung color using css
     set_background_color(right_box);
+
+    //create an image for profile image
+    GtkWidget *profile_image = set_image("images/profile.png", 90, 90);
+
+    //set uername title label 
+    const gchar *u_label = "<b><span foreground=\"black\" size=\'x-large\'>USER  LOGIN</span></b>";
+    GtkWidget *user_label = set_label(u_label);
+
+    // Username entry
+    GtkWidget *username_entry = create_entry("Username");
+
+    // Password entry
+    GtkWidget *passwort_entry = create_entry("Password");
+
+    //connect the signal
+    LoginContext *ctx = g_new(LoginContext, 1);
+    ctx->username_entry = username_entry;
+    ctx->password_entry = password_entry;
+
+    //create login button
+    login_button = create_button("Login");
+    g_signal_connect(login_button, "clicked", G_CALLBACK(on_login_clicked), ctx);
+    
+    // Remember me checkbox
+    GtkWidget *remember = gtk_check_button_new_with_label("Remember me");
+
+    //create link button passwort forgot
+    GtkWidget *forgot_passwort = create_link_button("Forgot passwort");
+
+    // Create account prompt
+    GtkWidget *create = create_button("Create Account"); 
+    g_signal_connect(create, "clicked", G_CALLBACK(open_signup_window), NULL);
+
+    //no account yet label
+    const gchar *label2 = "<span foreground=\"black\" size=\'x-large\'>No account yet?</span>";
+    GtkWidget *no_label = set_label(label2);
+    
+    gtk_box_pack_start(GTK_BOX(right_box), profile_image, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(right_box), user_label, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(right_box), username_name, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(right_box), passwort_name, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(right_box), remember, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(right_box), login_button, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(right_box), forgot_passwort, FALSE, FALSE, 0);
+    gtk_box_pack_end(GTK_BOX(right_box), create, FALSE, FALSE, 0);
+    gtk_box_pack_end(GTK_BOX(right_box), no_label, FALSE, FALSE, 0);
 
     //line separator for the bleft and right boxes
     GtkWidget *box_separator = gtk_separator_new(0);
