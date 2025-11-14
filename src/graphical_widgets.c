@@ -1,6 +1,34 @@
 #include"graphical_widgets.h"
 #include <gtk/gtk.h>
 
+void set_background_image(GtkWidget* lbox){
+    GtkCssProvider *lprovider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(lprovider,
+        "#left-box { background-image: url(\"images/background.png\");background-size: cover;"
+        " padding: 20px;"
+        " border-radius: 15px;"
+        "}", 
+        -1, NULL);
+
+    GtkStyleContext *lcontext = gtk_widget_get_style_context(lbox);
+    gtk_style_context_add_provider(lcontext, GTK_STYLE_PROVIDER(lprovider),
+                                    GTK_STYLE_PROVIDER_PRIORITY_USER);
+}
+
+void set_background_color(GtkWidget* rbox){
+    GtkCssProvider *provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(provider,
+        "#right-box { background-color: #0165BD;"
+        " padding: 20px;"
+        " border-radius: 15px;"
+        "}",
+        -1, NULL);
+
+    GtkStyleContext *context = gtk_widget_get_style_context(rbox);
+    gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider),
+                                    GTK_STYLE_PROVIDER_PRIORITY_USER);
+
+}
 
 GtkWidget* create_main_window(void){
 
@@ -26,35 +54,14 @@ GtkWidget* create_main_window(void){
     gtk_widget_set_name(left_box, "left-box");
 
     //add an image as background
-    GtkCssProvider *lprovider = gtk_css_provider_new();
-    gtk_css_provider_load_from_data(lprovider,
-        "#left-box { background-image: url(\"images/background.png\");background-size: cover;"
-        " padding: 20px;"
-        " border-radius: 15px;"
-        "}", 
-        -1, NULL);
-
-    GtkStyleContext *lcontext = gtk_widget_get_style_context(left_box);
-    gtk_style_context_add_provider(lcontext, GTK_STYLE_PROVIDER(lprovider),
-                                    GTK_STYLE_PROVIDER_PRIORITY_USER);
-
+    set_background_image(left_box);
 
     //vertical right box container for user inputs
     GtkWidget *right_box = gtk_box_new(1, 5);
     gtk_widget_set_name(right_box, "right-box");
 
     //set a backgroung color using css
-    GtkCssProvider *provider = gtk_css_provider_new();
-    gtk_css_provider_load_from_data(provider,
-        "#right-box { background-color: #0165BD;"
-        " padding: 20px;"
-        " border-radius: 15px;"
-        "}",
-        -1, NULL);
-
-    GtkStyleContext *context = gtk_widget_get_style_context(right_box);
-    gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider),
-                                    GTK_STYLE_PROVIDER_PRIORITY_USER);
+    set_background_color(right_box);
 
     //line separator for the bleft and right boxes
     GtkWidget *box_separator = gtk_separator_new(0);
