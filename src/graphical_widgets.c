@@ -114,7 +114,6 @@ GtkWidget* create_button(const gchar *button_label) {
 GtkWidget* create_link_button(const gchar *link_label){
     const gchar *link_label = link_label;
     GtkWidget *link_button = gtk_link_button_new_with_label("about:blank", link_label);
-    g_signal_connect(link_button, "activate-link", G_CALLBACK(on_link_clicked), NULL);
     gtk_widget_set_name(link_button, "passwort-style");
 
     // CSS provider
@@ -140,6 +139,38 @@ GtkWidget* create_link_button(const gchar *link_label){
                                 GTK_STYLE_PROVIDER_PRIORITY_USER);
 
     return link_button;
+}
+
+//when link button is clicked
+gboolean on_link_clicked(GtkLinkButton *button, gpointer user_data) {
+    (void)button;
+    (void) user_data;
+    GtkWidget *dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL,
+        GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "Password recovery coming soon!");
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+    return TRUE;  // Prevent default URI opening
+}
+
+//extract the text and call your open_connect_window():
+void on_login_clicked(GtkWidget *button, gpointer user_data) {
+    LoginContext *ctx = (LoginContext *)user_data;
+
+    const gchar *username = gtk_entry_get_text(GTK_ENTRY(ctx->username_entry));
+    const gchar *password = gtk_entry_get_text(GTK_ENTRY(ctx->password_entry));
+
+    if (g_strcmp0(username, "") == 0 || g_strcmp0(password, "") == 0) {
+        GtkWidget *dialog = gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_toplevel(button)),
+            GTK_DIALOG_MODAL, GTK_MESSAGE_WARNING, GTK_BUTTONS_OK,
+            "Please enter both username and password.");
+        gtk_dialog_run(GTK_DIALOG(dialog));
+        gtk_widget_destroy(dialog);
+        
+        return;
+    }
+
+    open_connect_window(username, password);  // Your custom function
+    //g_free(ctx);  // Only if you're done with it and not using it again
 }
 
 GtkWidget* create_main_window(void){
@@ -211,6 +242,7 @@ GtkWidget* create_main_window(void){
 
     //create link button passwort forgot
     GtkWidget *forgot_passwort = create_link_button("Forgot passwort");
+    g_signal_connect(forgot_passwort, "activate-link", G_CALLBACK(on_link_clicked), NULL);
 
     // Create account prompt
     GtkWidget *create = create_button("Create Account"); 
