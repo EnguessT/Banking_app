@@ -16,6 +16,54 @@ GtkWidget* create_main_window(void){
     //set window default size
 	gtk_window_set_default_size(GTK_WINDOW(window), 800, 500);
 
+    //create parent box container
+    GtkWidget *parent_box = gtk_box_new(0, 5);
+	gtk_container_add(GTK_CONTAINER(window), parent_box);
+
+    //vertical left box container for  title and logo
+    GtkWidget *left_box = gtk_box_new(1, 10);
+    gtk_widget_set_size_request(left_box, 300, -1); 
+    gtk_widget_set_name(left_box, "left-box");
+
+    //add an image as background
+    GtkCssProvider *lprovider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(lprovider,
+        "#left-box { background-image: url(\"images/background.png\");background-size: cover;"
+        " padding: 20px;"
+        " border-radius: 15px;"
+        "}", 
+        -1, NULL);
+
+    GtkStyleContext *lcontext = gtk_widget_get_style_context(left_box);
+    gtk_style_context_add_provider(lcontext, GTK_STYLE_PROVIDER(lprovider),
+                                    GTK_STYLE_PROVIDER_PRIORITY_USER);
+
+
+    //vertical right box container for user inputs
+    GtkWidget *right_box = gtk_box_new(1, 5);
+    gtk_widget_set_name(right_box, "right-box");
+
+    //set a backgroung color using css
+    GtkCssProvider *provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(provider,
+        "#right-box { background-color: #0165BD;"
+        " padding: 20px;"
+        " border-radius: 15px;"
+        "}",
+        -1, NULL);
+
+    GtkStyleContext *context = gtk_widget_get_style_context(right_box);
+    gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(provider),
+                                    GTK_STYLE_PROVIDER_PRIORITY_USER);
+
+    //line separator for the bleft and right boxes
+    GtkWidget *box_separator = gtk_separator_new(0);
+    gtk_widget_set_size_request(box_separator, 2, -1);  
+
+	gtk_box_pack_start(GTK_BOX(parent_box), left_box, FALSE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(parent_box), box_separator, FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(parent_box), right_box, TRUE, TRUE, 0);
+
     g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
     return window;
