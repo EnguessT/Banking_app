@@ -30,16 +30,27 @@ void set_background_color(GtkWidget* rbox){
 
 }
 
-GtkWidget* create_label(const gchar *label_markup) {
+//to create simple label without css style
+GtkWidget* set_label(const gchar *label_markup) {
+    GtkWidget *label = gtk_label_new(NULL);
+    gtk_widget_set_margin_top(label, 5);
+
+    gtk_label_set_markup(GTK_LABEL(label), label_markup);
+    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE); 
+    return label;
+}
+
+GtkWidget* create_label(const gchar *label_markup, GtkJustification justification) {
     GtkWidget *label = gtk_label_new(NULL);
     gtk_label_set_markup(GTK_LABEL(label), label_markup);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
-
+    gtk_label_set_justify(GTK_LABEL(label), justification);
+    
     gtk_widget_set_name(label, "label");
     gtk_widget_set_margin_top(label, 60);
     gtk_widget_set_margin_start(label, 40); 
     gtk_widget_set_halign(label, GTK_ALIGN_START);
+    //gtk_widget_set_halign(label, GTK_ALIGN_CENTER);   
 
     GtkCssProvider *label_provider = gtk_css_provider_new();
     gtk_css_provider_load_from_data(label_provider,
@@ -91,7 +102,7 @@ GtkWidget* create_main_window(void){
     GtkWidget *bank_image = set_image("images/banking.png", 70, 70);
     //set the label
     const gchar *markup = "<span foreground='white' size='28000'>Hello,\n<b>Welcome!</b></span>";
-    GtkWidget *hello_label = create_label(markup);
+    GtkWidget *hello_label = create_label(markup, GTK_JUSTIFY_LEFT);
 
     gtk_box_pack_start(GTK_BOX(left_box), bank_image, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(left_box), hello_label, FALSE, FALSE, 0);
@@ -99,6 +110,16 @@ GtkWidget* create_main_window(void){
     //vertical right box container for user inputs
     GtkWidget *right_box = gtk_box_new(1, 5);
     gtk_widget_set_name(right_box, "right-box");
+    //create an image for profile image
+    GtkWidget *profile_image = set_image("images/profile.png", 90, 90);
+
+    gchar *u_label = "<b><span foreground=\"black\" size=\'x-large\'>USER  LOGIN</span></b>";
+    GtkWidget *user_label = set_label(u_label);
+
+    gtk_box_pack_start(GTK_BOX(right_box), profile_image, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(right_box), user_label, FALSE, FALSE, 0);
+
+
 
     //set a backgroung color using css
     set_background_color(right_box);
