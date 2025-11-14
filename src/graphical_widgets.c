@@ -30,6 +30,37 @@ void set_background_color(GtkWidget* rbox){
 
 }
 
+GtkWidget* create_label(const gchar *label_markup) {
+    GtkWidget *label = gtk_label_new(NULL);
+    gtk_label_set_markup(GTK_LABEL(label), label_markup);
+    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+
+    gtk_widget_set_name(label, "label");
+    gtk_widget_set_margin_top(label, 60);
+    gtk_widget_set_margin_start(label, 40); 
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+
+    GtkCssProvider *label_provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(label_provider,
+        "#label { color: white; font-size: 24px; font-weight: bold; }",
+        -1, NULL);
+
+    GtkStyleContext *label_context = gtk_widget_get_style_context(label);
+    gtk_style_context_add_provider(label_context,
+        GTK_STYLE_PROVIDER(label_provider),
+        GTK_STYLE_PROVIDER_PRIORITY_USER);
+
+    return label;
+}
+
+GtkWidget* set_image(const char* filename, int width, int height) {
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale(filename, width, height, TRUE, NULL);
+    GtkWidget *image = gtk_image_new_from_pixbuf(pixbuf);
+    gtk_widget_set_margin_top(image, 10);
+    return image;
+}
+
 GtkWidget* create_main_window(void){
 
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -55,6 +86,15 @@ GtkWidget* create_main_window(void){
 
     //add an image as background
     set_background_image(left_box);
+
+    //create an image for bank image
+    GtkWidget *bank_image = set_image("images/banking.png", 70, 70);
+    //set the label
+    const gchar *markup = "<span foreground='white' size='28000'>Hello,\n<b>Welcome!</b></span>";
+    GtkWidget *hello_label = create_label(markup);
+
+    gtk_box_pack_start(GTK_BOX(left_box), bank_image, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(left_box), hello_label, FALSE, FALSE, 0);
 
     //vertical right box container for user inputs
     GtkWidget *right_box = gtk_box_new(1, 5);
