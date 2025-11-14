@@ -1,4 +1,4 @@
-#include"graphical_widgets.h"
+#include"main_window.h"
 #include <gtk/gtk.h>
 
 void set_background_image(GtkWidget* lbox){
@@ -37,6 +37,7 @@ GtkWidget* set_label(const gchar *label_markup) {
 
     gtk_label_set_markup(GTK_LABEL(label), label_markup);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE); 
+
     return label;
 }
 
@@ -50,7 +51,6 @@ GtkWidget* create_label(const gchar *label_markup, GtkJustification justificatio
     gtk_widget_set_margin_top(label, 60);
     gtk_widget_set_margin_start(label, 40); 
     gtk_widget_set_halign(label, GTK_ALIGN_START);
-    //gtk_widget_set_halign(label, GTK_ALIGN_CENTER);   
 
     GtkCssProvider *label_provider = gtk_css_provider_new();
     gtk_css_provider_load_from_data(label_provider,
@@ -69,12 +69,13 @@ GtkWidget* set_image(const char* filename, int width, int height) {
     GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_scale(filename, width, height, TRUE, NULL);
     GtkWidget *image = gtk_image_new_from_pixbuf(pixbuf);
     gtk_widget_set_margin_top(image, 10);
+
     return image;
 }
 
 GtkWidget* create_entry(const gchar *entry_label) {
     GtkWidget *entry_name = gtk_entry_new();
-    gtk_entry_set_placeholder_text(GTK_ENTRY(username_entry), entry_label);
+    gtk_entry_set_placeholder_text(GTK_ENTRY(entry_name), entry_label);
     gtk_widget_set_name(entry_name, "entry");
     GtkCssProvider *user_provider = gtk_css_provider_new();
     gtk_css_provider_load_from_data(user_provider,
@@ -111,9 +112,8 @@ GtkWidget* create_button(const gchar *button_label) {
     return button;
 }
 
-GtkWidget* create_link_button(const gchar *link_label){
-    const gchar *link_label = link_label;
-    GtkWidget *link_button = gtk_link_button_new_with_label("about:blank", link_label);
+GtkWidget* create_link_button(const gchar *li_label){
+    GtkWidget *link_button = gtk_link_button_new_with_label("about:blank", li_label);
     gtk_widget_set_name(link_button, "passwort-style");
 
     // CSS provider
@@ -143,12 +143,15 @@ GtkWidget* create_link_button(const gchar *link_label){
 
 //when link button is clicked
 gboolean on_link_clicked(GtkLinkButton *button, gpointer user_data) {
+
     (void)button;
     (void) user_data;
+
     GtkWidget *dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL,
         GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "Password recovery coming soon!");
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
+
     return TRUE;  // Prevent default URI opening
 }
 
@@ -169,8 +172,8 @@ void on_login_clicked(GtkWidget *button, gpointer user_data) {
         return;
     }
 
-    open_connect_window(username, password);  // Your custom function
-    //g_free(ctx);  // Only if you're done with it and not using it again
+    open_connect_window(username, password);  custom function
+    //g_free(ctx);  // When done with ctx and not using it again
 }
 
 void open_connect_window(const gchar* name, const gchar* pass) {
@@ -210,6 +213,39 @@ void open_signup_window(void) {
 	gtk_widget_show_all(register_window);
 	gtk_main();
 
+}
+
+void on_create_clicked(GtkWidget *button, gpointer user_infos) {
+    RegistrationContext *rtx = (RegistrationContext *)user_infos;
+
+    const gchar *name = gtk_entry_get_text(GTK_ENTRY(rtx->name_entry));
+    const gchar *birth = gtk_entry_get_text(GTK_ENTRY(rtx->birth_entry));
+    const gchar *email = gtk_entry_get_text(GTK_ENTRY(rtx->email_entry));
+    const gchar *phone_number = gtk_entry_get_text(GTK_ENTRY(rtx->phone_entry));
+    const gchar *city = gtk_entry_get_text(GTK_ENTRY(rtx->city_entry));
+    const gchar *street = gtk_entry_get_text(GTK_ENTRY(rtx->street_entry));
+    const gchar *house_number = gtk_entry_get_text(GTK_ENTRY(rtx->house_entry));
+    const gchar *zipcode = gtk_entry_get_text(GTK_ENTRY(rtx->zip_entry));
+    const gchar *user_id = gtk_entry_get_text(GTK_ENTRY(rtx->id_entry));
+    const gchar *password = gtk_entry_get_text(GTK_ENTRY(rtx->password_entry));
+
+    if (g_strcmp0(name, "") == 0 || g_strcmp0(birth, "") == 0 || g_strcmp0(email, "") == 0 ||
+        g_strcmp0(phone_number, "") == 0 ||g_strcmp0(city, "") == 0 ||g_strcmp0(street, "") == 0 ||
+        g_strcmp0(house_number, "") == 0 ||g_strcmp0(zipcode, "") == 0 ||
+        g_strcmp0(user_id, "") == 0 || g_strcmp0(password, "") == 0) {
+        GtkWidget *dialog = gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_toplevel(button)),
+            GTK_DIALOG_MODAL, GTK_MESSAGE_WARNING, GTK_BUTTONS_OK,
+            "Please enter all the informations.");
+
+        gtk_dialog_run(GTK_DIALOG(dialog));
+        gtk_widget_destroy(dialog);
+        
+        return;
+    }
+
+    open_create_account(name, birth, email, phone_number, city, street, house_number, 
+        zipcode, user_id, password);  
+    //g_free(rtx);  // Only if you're done with it and not using it again
 }
 
 GtkWidget* create_main_window(void){
@@ -265,7 +301,7 @@ GtkWidget* create_main_window(void){
     GtkWidget *username_entry = create_entry("Username");
 
     // Password entry
-    GtkWidget *passwort_entry = create_entry("Password");
+    GtkWidget *password_entry = create_entry("Password");
 
     //connect the signal
     LoginContext *ctx = g_new(LoginContext, 1);
@@ -273,7 +309,7 @@ GtkWidget* create_main_window(void){
     ctx->password_entry = password_entry;
 
     //create login button
-    login_button = create_button("Login");
+    GtkWidget *login_button = create_button("Login");
     g_signal_connect(login_button, "clicked", G_CALLBACK(on_login_clicked), ctx);
     
     // Remember me checkbox
@@ -293,10 +329,10 @@ GtkWidget* create_main_window(void){
     
     gtk_box_pack_start(GTK_BOX(right_box), profile_image, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(right_box), user_label, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(right_box), username_name, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(right_box), passwort_name, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(right_box), remember, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(right_box), username_entry, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(right_box), password_entry, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(right_box), login_button, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(right_box), remember, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(right_box), forgot_passwort, FALSE, FALSE, 0);
     gtk_box_pack_end(GTK_BOX(right_box), create, FALSE, FALSE, 0);
     gtk_box_pack_end(GTK_BOX(right_box), no_label, FALSE, FALSE, 0);

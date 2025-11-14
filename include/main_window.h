@@ -1,5 +1,5 @@
-#ifndef GRAPHICAL_WIDGETS_H
-#define GRAPHICAL_WIDGETS_H
+#ifndef MAIN_WINDOW_H
+#define MAIN_WINDOW_H
 #include <gtk/gtk.h>
 
 typedef struct {
