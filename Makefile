@@ -20,25 +20,25 @@ all: $(TARGET)
 
 # Create obj directory if needed
 $(OBJ_DIR):
-    @mkdir -p $(OBJ_DIR)
+	@mkdir -p $(OBJ_DIR)
 
 # Link object files into final binary
 $(TARGET): $(OBJ_DIR) $(OBJECTS)
-    @$(CC) $(OBJECTS) -o $(TARGET) $(LIBS)
-    @echo "Compilation finished"
+	@$(CC) $(OBJECTS) -o $(TARGET) $(LIBS)
+	@echo "Compilation finished"
 
 # Compile each .c file into .o file
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
-    @mkdir -p $(dir $@)
-    @$(CC) $(CFLAGS) -c $< -o $@
+	@mkdir -p $(dir $@)
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 # Run the app
 run: $(TARGET)
-    @./$(TARGET)
+	@./$(TARGET)
 
 # Clean build artifacts
 clean:
-    @rm -rf $(OBJ_DIR) $(TARGET)
-    @echo "Cleaned up build files"
+	@rm -rf $(OBJ_DIR) $(TARGET)
+	@echo "Cleaned up build files"
 
 .PHONY: all clean run

@@ -1,6 +1,6 @@
 #include"main_window.h"
 #include "widgets.h"
-#include <gtk/gtk.h>
+//#include <gtk/gtk.h>
 
 
 //when link button is clicked
@@ -34,7 +34,7 @@ void on_login_clicked(GtkWidget *button, gpointer user_data) {
         return;
     }
 
-    open_connect_window(username, password);  custom function
+    open_connect_window(username, password);  //custom function
     //g_free(ctx);  // When done with ctx and not using it again
 }
 
