@@ -2,7 +2,7 @@
 #include <gtk/gtk.h>
 
 
-GtkWidget* create_main_window(){
+GtkWidget* create_main_window(void){
 
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     //set window default position
