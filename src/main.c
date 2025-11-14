@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <gtk/gtk.h>
-#include "graphical_widgets.h"
+#include "main_window.h"
 
 int main(int argc, char* argv[]) {
 
