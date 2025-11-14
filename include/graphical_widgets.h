@@ -33,4 +33,6 @@ GtkWidget* create_button(const gchar *button_label);
 GtkWidget* create_link_button(const gchar *link_label);
 gboolean on_link_clicked(GtkLinkButton *button, gpointer user_data);
 void on_login_clicked(GtkWidget *button, gpointer user_data);
+void open_connect_window(const gchar* name, const gchar* pass);
+void open_signup_window(void);
 #endif
