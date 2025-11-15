@@ -2,6 +2,12 @@
 #include <sqlite3.h>
 #include <regex.h>
 
+/***
+ * This function check if the user entry are valid
+ * by comparing the user inputs here input 
+ * to some pattern here re_expression using regular expressions 
+ * if pattern doesn't match open a dialog window
+ */
 void is_valid_operation(const gchar* input, const char *re_expression, const char *dialog_message) {
     regex_t regex;
     int n_reti = regcomp(&regex, re_expression, REG_EXTENDED);
@@ -23,6 +29,10 @@ void is_valid_operation(const gchar* input, const char *re_expression, const cha
     regfree(&regex);
 }
 
+/**
+ * This function open a dialog window with a 
+ * define message.
+ */
 void show_warning_dialog(const char *message) {
     GtkWidget *dialog = gtk_message_dialog_new(NULL,
         GTK_DIALOG_MODAL, GTK_MESSAGE_WARNING, GTK_BUTTONS_OK,
@@ -31,6 +41,11 @@ void show_warning_dialog(const char *message) {
     gtk_widget_destroy(dialog);
 }
 
+/**
+ * This function check if the entered user birthdate here input
+ * is valid and  follow the format dd/MM/YYYY or dd.MM.YYYY
+ * if not open a dialog window.
+ */
 bool is_valid_birthdate(const gchar* input) {
     regex_t regex;
     const char *pattern = "^([0-9]{2}/[0-9]{2}/[0-9]{4}|[0-9]{2}\\.[0-9]{2}\\.[0-9]{4})$";
@@ -77,6 +92,9 @@ bool is_valid_birthdate(const gchar* input) {
     return true;
 }
 
+/**
+ * This function create a database to store all users's datas
+ */
 int create_user_table() {
     sqlite3 *db;
     if (sqlite3_open("users.db", &db) != SQLITE_OK) {
@@ -113,11 +131,14 @@ int create_user_table() {
     } 
 
     sqlite3_close(db);
-    
+
     return EXIT_SUCCESS;
 }
 
-
+/**
+ * This function is called to create the user account
+ * after the inputs validation are all correct
+ */
 void open_create_account(const gchar* name, const gchar* birth, const gchar* mail,
                 const gchar* phone, const gchar* city, const gchar* street,
                 const gchar* house, const gchar* zip, const gchar* password) 
@@ -133,6 +154,12 @@ void open_create_account(const gchar* name, const gchar* birth, const gchar* mai
     printf("Passwort: %s\n", password);
 }
 
+/**
+ * This function is called when the user click on 
+ * button create in the registration window
+ * it takes the user input datas and proceed with 
+ * inputs validation checking.
+ */
 void on_create_clicked(GtkWidget *button, gpointer user_infos) {
     RegistrationContext *rtx = (RegistrationContext *)user_infos;
 
@@ -162,7 +189,7 @@ void on_create_clicked(GtkWidget *button, gpointer user_infos) {
         return;
     }
 
-    //valiadation username
+    //validation username
     const char *name_pattern = "^[A-Za-zÀ-ÿ' -]+$";
     const char *name_warning = "Names have only letters, and characters: ' - and space.";
     is_valid_operation(name, name_pattern, name_warning);
@@ -219,12 +246,17 @@ void on_create_clicked(GtkWidget *button, gpointer user_infos) {
         gtk_widget_destroy(dialog);
     }
 
+    create_user_table();
 
     open_create_account(name, birth, email, phone_number, city, street, house_number, 
         zipcode, password);  
     //g_free(rtx);  // Only if you're done with it and not using it again
 }
 
+
+/**
+ * This function is called to create the registration window
+ */
 void open_signup_window(void) {
 
     GtkWidget *register_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);

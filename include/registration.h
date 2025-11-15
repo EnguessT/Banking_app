@@ -27,4 +27,5 @@ void open_create_account(const gchar* name, const gchar* birth, const gchar* mai
 
 int create_user_table();
 
+
 #endif
