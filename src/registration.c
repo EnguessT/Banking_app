@@ -1,4 +1,116 @@
 #include "registration.h"
+#include <regex.h>
+
+
+bool is_valid_name(const gchar* username) {
+    regex_t regex;
+    int n_reti = regcomp(&regex, "^[A-Za-zÀ-ÿ' -]+$", REG_EXTENDED);
+    if (n_reti != 0) return FALSE;
+
+    n_reti = regexec(&regex, username, 0, NULL, 0);
+    regfree(&regex);
+    return (n_reti == 0);
+}
+
+bool is_valid_birthdate(const gchar* birth_date){
+    regex_t regex;
+    int n_reti = regcomp(&regex, "^([0-9]{2}/[0-9]{2}/[0-9]{4}|[0-9]{2}\\.[0-9]{2}\\.[0-9]{4})$", REG_EXTENDED);
+    if (n_reti != 0) return FALSE;
+
+    n_reti = regexec(&regex, birth_date, 0, NULL, 0);
+    regfree(&regex);
+    return (n_reti == 0);
+
+}
+
+bool is_valid_email_address(const gchar* email){
+    regex_t regex;
+    int n_reti = regcomp(&regex, "^[^@]+@[^@]+\.[^@]+$ ", REG_EXTENDED);
+    if (n_reti != 0) return FALSE;
+
+    n_reti = regexec(&regex, email, 0, NULL, 0);
+    regfree(&regex);
+    return (n_reti == 0);
+
+}
+
+bool is_valid_phone_number(const gchar* phone){
+    regex_t regex;
+    int n_reti = regcomp(&regex, "^[0-9]{12}$", REG_EXTENDED);
+    if (n_reti != 0) return FALSE;
+
+    n_reti = regexec(&regex, phone, 0, NULL, 0);
+    regfree(&regex);
+    return (n_reti == 0);
+
+}
+
+bool is_valid_city(const gchar* city){
+    regex_t regex;
+    int n_reti = regcomp(&regex, "^[A-Za-zÀ-ÿ' -]+$", REG_EXTENDED);
+    if (n_reti != 0) return FALSE;
+
+    n_reti = regexec(&regex, city, 0, NULL, 0);
+    regfree(&regex);
+    return (n_reti == 0);
+
+}
+
+bool is_valid_street(const gchar* street){
+    regex_t regex;
+    int n_reti = regcomp(&regex, "^[A-Za-zÀ-ÿ' -]+$", REG_EXTENDED);
+    if (n_reti != 0) return FALSE;
+
+    n_reti = regexec(&regex, username, 0, NULL, 0);
+    regfree(&regex);
+    return (n_reti == 0);
+
+}
+
+bool is_valid_house_number(const gchar* house_number){
+    regex_t regex;
+    int n_reti = regcomp(&regex, "^[0-9]{1,4}$", REG_EXTENDED);
+    if (n_reti != 0) return FALSE;
+
+    n_reti = regexec(&regex, username, 0, NULL, 0);
+    regfree(&regex);
+    return (n_reti == 0);
+
+}
+
+bool is_valid_zipcode(const gchar* zipcode){
+    regex_t regex;
+    int n_reti = regcomp(&regex, "^[0-9]{5}$", REG_EXTENDED);
+    if (n_reti != 0) return FALSE;
+
+    n_reti = regexec(&regex, zipcode, 0, NULL, 0);
+    regfree(&regex);
+    return (n_reti == 0);
+
+}
+
+bool is_valid_user_id(const gchar* user_id){
+    regex_t regex;
+    int n_reti = regcomp(&regex, "^[a-zA-Z0-9_-À-ÿ' -]{6,}$", REG_EXTENDED); 
+    if (n_reti != 0) return FALSE;
+
+    n_reti = regexec(&regex, user_id, 0, NULL, 0);
+    regfree(&regex);
+    return (n_reti == 0);
+
+}
+
+bool is_valid_passwort(const gchar* password){
+    regex_t regex;
+    int n_reti = regcomp(&regex, "^(?=.*[A-Z])(?=.*[0-9])(?=.*[ \\-_*+=@#\\/?!%$€]).{8,}$", REG_EXTENDED);
+    if (n_reti != 0) return FALSE;
+
+    n_reti = regexec(&regex, password, 0, NULL, 0);
+    regfree(&regex);
+    return (n_reti == 0);
+
+}
+
 
 void open_create_account(const gchar* name, const gchar* birth, const gchar* mail,
                 const gchar* phone, const gchar* city, const gchar* street,
@@ -187,7 +299,7 @@ void open_signup_window(void) {
 
     g_signal_connect(register_window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
 	gtk_widget_show_all(register_window);
-    
+
 	gtk_main();
 
 }
