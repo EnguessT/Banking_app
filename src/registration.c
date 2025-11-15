@@ -261,6 +261,43 @@ void open_create_account(const gchar* name, const gchar* birth, const gchar* mai
 }
 
 /**
+ * This function create a database to keep track
+ * of user operations
+ */
+int operation_made() {
+    sqlite3 *db;
+    if (sqlite3_open("opeartions.db", &db) != SQLITE_OK) {
+        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+        return EXIT_FAILURE;
+    }
+
+    const char *sql = "CREATE TABLE IF NOT EXISTS operations ("
+                      "Operation_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                      "User_id INTEGER NOT NULL,"                    
+                      "Type TEXT NOT NULL,"                          
+                      "Amount DOUBLE NOT NULL,"
+                      "Timestamp TEXT DEFAULT CURRENT_TIMESTAMP,"
+                      "Description TEXT,"
+                      "FOREIGN KEY(user_id) REFERENCES users(ID));";
+
+    char *err_msg = NULL;
+    int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    
+    if (rc != SQLITE_OK ) {
+        
+        fprintf(stderr, "SQL error: %s\n", err_msg);
+        
+        sqlite3_free(err_msg);        
+        sqlite3_close(db);
+        
+        return 1;
+    } 
+
+    sqlite3_close(db);
+}
+
+/**
  * This function is called when the user click on 
  * button create in the registration window
  * it takes the user input datas and proceed with 
