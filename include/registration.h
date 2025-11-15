@@ -13,7 +13,6 @@ typedef struct{
     GtkWidget *street_entry;
     GtkWidget *house_entry;
     GtkWidget *zip_entry;
-    GtkWidget *id_entry;
     GtkWidget *password_entry;
     GtkWidget *re_password_entry;
 }RegistrationContext;
@@ -24,8 +23,7 @@ void open_signup_window(void);
 void on_create_clicked(GtkWidget *button, gpointer user_infos);
 void open_create_account(const gchar* name, const gchar* birth, const gchar* mail,
                 const gchar* phone, const gchar* city, const gchar* street,
-                const gchar* house, const gchar* zip,
-                const gchar* ID, const gchar* password);
+                const gchar* house, const gchar* zip, const gchar* password);
 
 
 

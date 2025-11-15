@@ -79,8 +79,7 @@ bool is_valid_birthdate(const gchar* input) {
 
 void open_create_account(const gchar* name, const gchar* birth, const gchar* mail,
                 const gchar* phone, const gchar* city, const gchar* street,
-                const gchar* house, const gchar* zip,
-                const gchar* ID, const gchar* password) 
+                const gchar* house, const gchar* zip, const gchar* password) 
 {
     char buffer[200];
     printf("Account create\n");
@@ -90,7 +89,6 @@ void open_create_account(const gchar* name, const gchar* birth, const gchar* mai
     printf("phone number: %s\n", phone);
     sprintf(buffer, "%s %s, %s %s", street,house,zip, city);
     printf("Address is: %s\n", buffer);
-    printf("ID: %s\n", ID);
     printf("Passwort: %s\n", password);
 }
 
@@ -105,14 +103,13 @@ void on_create_clicked(GtkWidget *button, gpointer user_infos) {
     const gchar *street = gtk_entry_get_text(GTK_ENTRY(rtx->street_entry));
     const gchar *house_number = gtk_entry_get_text(GTK_ENTRY(rtx->house_entry));
     const gchar *zipcode = gtk_entry_get_text(GTK_ENTRY(rtx->zip_entry));
-    const gchar *user_id = gtk_entry_get_text(GTK_ENTRY(rtx->id_entry));
     const gchar *password = gtk_entry_get_text(GTK_ENTRY(rtx->password_entry));
     const gchar *re_password = gtk_entry_get_text(GTK_ENTRY(rtx->re_password_entry));
 
     if (g_strcmp0(name, "") == 0 || g_strcmp0(birth, "") == 0 || g_strcmp0(email, "") == 0 ||
         g_strcmp0(phone_number, "") == 0 ||g_strcmp0(city, "") == 0 ||g_strcmp0(street, "") == 0 ||
         g_strcmp0(house_number, "") == 0 ||g_strcmp0(zipcode, "") == 0 ||
-        g_strcmp0(user_id, "") == 0 || g_strcmp0(password, "") == 0 || g_strcmp0(re_password, "") == 0) 
+        g_strcmp0(password, "") == 0 || g_strcmp0(re_password, "") == 0) 
     {
         GtkWidget *dialog = gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_toplevel(button)),
             GTK_DIALOG_MODAL, GTK_MESSAGE_WARNING, GTK_BUTTONS_OK,
@@ -162,11 +159,6 @@ void on_create_clicked(GtkWidget *button, gpointer user_infos) {
     const char *zip_warning = "Zipcode muss be a 5 digits";
     is_valid_operation(name, zip_pattern, zip_warning);
 
-    //validation user ID
-    const char *id_pattern = "^[a-zA-Z0-9_-À-ÿ' -]{6,}$";
-    const char *id_warning = "User ID muss have only letters and digits";
-    is_valid_operation(name, id_pattern, id_warning);
-
     //validation passwort
     const char *password_pattern = "^(?=.*[A-Z])(?=.*[0-9])(?=.*[ \\-_*+=@#\\/?!%$€]).{8,}$";
     const char *password_warning = "Passwort muss have at least 8 characters, have letters, digits, and "
@@ -188,7 +180,7 @@ void on_create_clicked(GtkWidget *button, gpointer user_infos) {
 
 
     open_create_account(name, birth, email, phone_number, city, street, house_number, 
-        zipcode, user_id, password);  
+        zipcode, password);  
     //g_free(rtx);  // Only if you're done with it and not using it again
 }
 
@@ -255,12 +247,6 @@ void open_signup_window(void) {
     gtk_widget_set_name(zip_entry, "entry");
     gtk_box_pack_start(GTK_BOX(main_box), zip_entry, FALSE, FALSE, 0);
 
-    // Id entry
-    GtkWidget *id_entry = create_entry("User ID");
-    gtk_entry_set_visibility(GTK_ENTRY(id_entry), FALSE);
-    gtk_widget_set_name(id_entry, "entry");
-    gtk_box_pack_start(GTK_BOX(main_box), id_entry, FALSE, FALSE, 0);
-
     //Password entry
     GtkWidget *password_entry = create_entry("Password");
     gtk_entry_set_visibility(GTK_ENTRY(password_entry), FALSE);
@@ -282,7 +268,6 @@ void open_signup_window(void) {
     rtx->street_entry = street_entry;
     rtx->house_entry = house_entry;
     rtx->zip_entry = zip_entry;
-    rtx->id_entry = id_entry;
     rtx->password_entry = password_entry;
     rtx->re_password_entry = re_password_entry;
 
