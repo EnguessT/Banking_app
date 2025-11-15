@@ -1,6 +1,7 @@
 #include "registration.h"
 #include <sqlite3.h>
 #include <regex.h>
+#include <bcrypt.h>
 
 /***
  * This function check if the user entry are valid
@@ -133,6 +134,25 @@ int create_user_table() {
     sqlite3_close(db);
 
     return EXIT_SUCCESS;
+}
+
+/**
+ * This function encrypts the user passwort using the bcrypt.h
+ * function for hashing and slating and returns the
+ * hashed passwort to store in the database
+ */
+char* encrypt_passwort(const char* passwort) {
+    char salt[BCRYPT_HASHSIZE];
+    char* hash = malloc(BCRYPT_HASHSIZE);
+    if (!hash) {
+        free(hash);
+        return NULL;
+    } 
+
+    bcrypt_gensalt(12, salt);
+    if (bcrypt_hashpw(passwort, salt, hash) != 0) return NULL;
+
+    return hash;  
 }
 
 /**
