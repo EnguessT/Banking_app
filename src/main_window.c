@@ -1,7 +1,8 @@
 #include"main_window.h"
 #include "widgets.h"
 #include "registration.h"
-//#include <gtk/gtk.h>
+#include <sqlite3.h>
+#include <bcrypt.h>
 
 
 //when link button is clicked
@@ -16,6 +17,50 @@ gboolean on_link_clicked(GtkLinkButton *button, gpointer user_data) {
     gtk_widget_destroy(dialog);
 
     return TRUE;  // Prevent default URI opening
+}
+
+/**
+ * This function proceed with the authentification
+ * taking the User_ID or Email and Password
+ * and checking if it is found in the database
+ */
+int authenticate_user(const char* identifier, const char* password_input) {
+    sqlite3 *db_user;
+    if (sqlite3_open("users.db", &db_user) != SQLITE_OK) {
+        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db_user));
+        return -1;
+    }
+
+    const char *sql = "SELECT ID, User_ID, Password "
+                      "FROM Users WHERE User_ID = ? OR Email = ?;";
+    sqlite3_stmt *stmt;
+    if (sqlite3_prepare_v2(db_user, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db_user));
+        sqlite3_close(db_user);
+        return -1;
+    }
+
+    // Bind the same identifier to both fields
+    sqlite3_bind_text(stmt, 1, identifier, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, identifier, -1, SQLITE_STATIC);
+
+    int result = -1;
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        sqlite3_int64 id = sqlite3_column_int64(stmt, 0);
+        const char *stored_hash = (const char *)sqlite3_column_text(stmt, 2);
+
+         if (bcrypt_checkpw(password_input, stored_hash) == 0) {
+            //login successful
+            result = (int)id;
+         } else {
+            //wrong passord
+            result = 0;
+         }
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(db_user);
+    return result;
 }
 
 //extract the text and call your open_connect_window():
