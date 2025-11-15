@@ -39,7 +39,7 @@ void open_create_account(const gchar* name, const gchar* birth, const gchar* mai
 
 int create_user_table();
 char* encrypt_passwort(const char* passwort);
-int add_user(RegistrationContext *user);
+sqlite3_int64 add_user(sqlite3 *db, RegistrationContext *user);
 int operation_made();
 int log_operation(sqlite3 *db, sqlite3_int64 user_id, OperationType type, double amount);
 

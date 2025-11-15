@@ -158,19 +158,7 @@ char* encrypt_passwort(const char* passwort) {
 /**
  * This function adds a user in the database and insert his datas
  */
-int add_user(RegistrationContext *user) {
-
-    sqlite3 *db;
-    
-    int rc = sqlite3_open("test.db", &db);
-    
-    if (rc != SQLITE_OK) {
-        
-        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
-        sqlite3_close(db);
-        
-        return EXIT_FAILURE;
-    }
+sqlite3_int64 add_user(sqlite3 *db, RegistrationContext *user) {
 
     const char *sql_insert = "INSERT INTO Users "
                          "(User_ID, Role, Username, Password, Birthdate,"
@@ -181,7 +169,7 @@ int add_user(RegistrationContext *user) {
     if (sqlite3_prepare_v2(db, sql_insert, -1, &stmt, 0) != SQLITE_OK) {
         fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db));
         sqlite3_close(db);
-        return EXIT_FAILURE;
+        return -1;
     }
 
     // Generate user ID
@@ -190,7 +178,7 @@ int add_user(RegistrationContext *user) {
         fprintf(stderr, "Failed to prepare ID query: %s\n", sqlite3_errmsg(db));
         sqlite3_finalize(stmt);
         sqlite3_close(db);
-        return EXIT_FAILURE;
+        return -1;
     }
 
     sqlite3_step(id_stmt);
@@ -233,12 +221,10 @@ int add_user(RegistrationContext *user) {
     }
 
     sqlite3_finalize(stmt);
-
-    sqlite3_close(db);
+    sqlite3_int64 new_user_id = sqlite3_last_insert_rowid(db);
     free(hash_password);
 
-    return EXIT_SUCCESS;
-
+    return new_user_id;
 }
 
 /**
@@ -295,12 +281,12 @@ int operation_made() {
     } 
 
     sqlite3_close(db);
-    
+
     return EXIT_SUCCESS;
 }
 
 /**
- * THis function insert user operation in 
+ * This function insert user operations in 
  * the operation database
  */
 int log_operation(sqlite3 *db, sqlite3_int64 user_id, OperationType type, double amount) {
@@ -397,54 +383,93 @@ void on_create_clicked(GtkWidget *button, gpointer user_infos) {
     //valiadation phone number
     const char *phone_pattern = "^[0-9]{12}$";
     const char *phone_warning = "Phone number is a 12 digits and no letters or specials characters.";
-    is_valid_operation(name, phone_pattern, phone_warning);
+    is_valid_operation(phone_number, phone_pattern, phone_warning);
 
     //valiadation city
     const char *city_pattern = "^[A-Za-zÀ-ÿ' -]+$";
     const char *city_warning = "City have only letters, and characters: ' - and space.";
-    is_valid_operation(name, city_pattern, city_warning);
+    is_valid_operation(city, city_pattern, city_warning);
 
     //validation street
     const char *street_pattern = "^[A-Za-zÀ-ÿ' -]+$";
     const char *street_warning = "Street have only letters and characters: ' - and space";
-    is_valid_operation(name, street_pattern, street_warning);
+    is_valid_operation(street, street_pattern, street_warning);
 
     //validation house number
     const char *house_pattern = "^[0-9]{1,4}$";
     const char *house_warning = "House number muss have at least 1 digit and 3 digits maximum";
-    is_valid_operation(name, house_pattern, house_warning);
+    is_valid_operation(house_number, house_pattern, house_warning);
 
     //validation zip code
     const char *zip_pattern = "^[0-9]{5}$";
     const char *zip_warning = "Zipcode muss be a 5 digits";
-    is_valid_operation(name, zip_pattern, zip_warning);
+    is_valid_operation(zipcode, zip_pattern, zip_warning);
 
     //validation passwort
     const char *password_pattern = "^(?=.*[A-Z])(?=.*[0-9])(?=.*[ \\-_*+=@#\\/?!%$€]).{8,}$";
     const char *password_warning = "Passwort muss have at least 8 characters, have letters, digits, and "
                              "special characters !+=?.,*-_/%$@";
 
-    is_valid_operation(name, password_pattern, password_warning);
+    is_valid_operation(password, password_pattern, password_warning);
 
     //validation re_passwort
-    if (g_strcmp0(password, re_password) == 0) {
-    // Strings are equal
-    } else {
+    if (g_strcmp0(password, re_password) != 0) {
         // Strings are different
-        GtkWidget *dialog = gtk_message_dialog_new(NULL,
-            GTK_DIALOG_MODAL, GTK_MESSAGE_WARNING, GTK_BUTTONS_OK,
-            "The two passworts do not match.");
-        gtk_dialog_run(GTK_DIALOG(dialog));
-        gtk_widget_destroy(dialog);
-    }
+        show_warning_dialog("The two passworts do not match.");
+        return;
+    } 
 
+    //create the Users database
     create_user_table();
 
     open_create_account(name, birth, email, phone_number, city, street, house_number, 
         zipcode, password);  
-    //g_free(rtx);  // Only if you're done with it and not using it again
-}
 
+    //open the User database
+    sqlite3 *db_user;
+    if (sqlite3_open("users.db", &db_user) != SQLITE_OK) {
+        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db_user));
+        return;
+    }
+
+    //insert user datas in the database and retrieve user ID
+    sqlite3_int64 new_user_id = add_user(db_user, rtx);
+    if (new_user_id == -1) {
+        show_warning_dialog("Failed to create account. Please try Again.");
+        sqlite3_close(db_user); 
+        return;
+    }
+
+    //show a dialog window for account creation success
+    show_warning_dialog("Account created successfully!");
+
+    //Zero out passwort from memory
+    for(size_t i = 0; password[i] != '\0'; ++i) {
+        ((volatile char*)password)[i] = 0;
+    }
+ 
+    // create the operation database
+    operation_made();
+
+    //log the operation
+    sqlite3 *db_operation;
+    if (sqlite3_open("operations.db", &db_operation) != SQLITE_OK) {
+        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db_operation));
+        sqlite3_close(db_user);
+        return;
+    }
+    
+    log_operation(db_operation, new_user_id, 1, 0.0);
+
+    //close the databases
+    sqlite3_close(db_user);
+    sqlite3_close(db_operation);
+
+    GtkWidget *window = gtk_widget_get_toplevel(button);
+    gtk_widget_destroy(window);
+
+    g_free(rtx); 
+}
 
 /**
  * This function is called to create the registration window
