@@ -19,7 +19,7 @@ typedef struct{
 }RegistrationContext;
 
 void is_valid_operation(const gchar* input, const char *re_expression, const char *dialog_message);
-
+void show_warning_dialog(const char *message);
 void open_signup_window(void);
 void on_create_clicked(GtkWidget *button, gpointer user_infos);
 void open_create_account(const gchar* name, const gchar* birth, const gchar* mail,

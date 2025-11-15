@@ -22,6 +22,61 @@ void is_valid_operation(const gchar* input, const char *re_expression, const cha
     regfree(&regex);
 }
 
+void show_warning_dialog(const char *message) {
+    GtkWidget *dialog = gtk_message_dialog_new(NULL,
+        GTK_DIALOG_MODAL, GTK_MESSAGE_WARNING, GTK_BUTTONS_OK,
+        "%s", message);
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+}
+
+bool is_valid_birthdate(const gchar* input) {
+    regex_t regex;
+    const char *pattern = "^([0-9]{2}/[0-9]{2}/[0-9]{4}|[0-9]{2}\\.[0-9]{2}\\.[0-9]{4})$";
+    const char *birth_warning = "Date of birth should be in format dd/MM/YYYY or dd.MM.YYYY";
+
+    if (regcomp(&regex, pattern, REG_EXTENDED) != 0) {
+        fprintf(stderr, "Regex compilation failed for pattern: %s\n", pattern);
+        return false;
+    }
+
+    int match = regexec(&regex, input, 0, NULL, 0);
+    regfree(&regex);
+
+    if (match != 0) {
+        show_warning_dialog(birth_warning);
+        return false;
+    }
+
+    char normalized[16];
+    strncpy(normalized, input, sizeof(normalized));
+    normalized[sizeof(normalized) - 1] = '\0';
+    for (int i = 0; normalized[i]; i++) {
+        if (normalized[i] == '.') normalized[i] = '/';
+    }
+
+    int day, month, year;
+    if (sscanf(normalized, "%2d/%2d/%4d", &day, &month, &year) != 3) {
+        return false;
+    }
+
+    int days_in_month[] = { 31,28,31,30,31,30,31,31,30,31,30,31 };
+    const char *semantic_warning = "Date of birth is not a valid calendar date.";
+
+    if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) {
+        days_in_month[1] = 29;
+    }
+
+    if (year < 1900 || year > 2100 || month < 1 || month > 12 ||
+        day < 1 || day > days_in_month[month - 1]) {
+        show_warning_dialog(semantic_warning);
+        return false;
+    }
+
+    return true;
+}
+
+
 void open_create_account(const gchar* name, const gchar* birth, const gchar* mail,
                 const gchar* phone, const gchar* city, const gchar* street,
                 const gchar* house, const gchar* zip,
@@ -75,10 +130,8 @@ void on_create_clicked(GtkWidget *button, gpointer user_infos) {
     is_valid_operation(name, name_pattern, name_warning);
 
     //validation date of birth
-    const char *birth_pattern = "^([0-9]{2}/[0-9]{2}/[0-9]{4}|[0-9]{2}\\.[0-9]{2}\\.[0-9]{4})$";
-    const char *birth_warning = "Date of birth should as dd/MM/YYYY or dd.MM.YYYY";
-    is_valid_operation(birth, birth_pattern, birth_warning);
-
+    is_valid_birthdate(birth);
+   
     //valiadation email address
     const char *email_pattern = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
     const char *email_warning = "Your email address is invalid";
