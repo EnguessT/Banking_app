@@ -1,4 +1,5 @@
 #include "registration.h"
+#include <sqlite3.h>
 #include <regex.h>
 
 void is_valid_operation(const gchar* input, const char *re_expression, const char *dialog_message) {
@@ -74,6 +75,46 @@ bool is_valid_birthdate(const gchar* input) {
     }
 
     return true;
+}
+
+int create_user_table() {
+    sqlite3 *db;
+    if (sqlite3_open("users.db", &db) != SQLITE_OK) {
+        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+        return EXIT_FAILURE;
+    }
+
+    const char *sql = "CREATE TABLE IF NOT EXISTS Users ("
+                       "User_ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+                       "Role TEXT NOT NULL DEFAULT 'Client',"
+                       "Username TEXT NOT NULL COLLATE NOCASE,"
+                       "Password TEXT NOT NULL,"
+                       "Birth_date TEXT,"
+                       "Email TEXT UNIQUE NOT NULL COLLATE NOCASE"
+                       "City TEXT ,"
+                       "Street TEXT,"
+                       "House_number TEXT,"
+                       "Zipcode TEXT,"
+                       "Balance DOUBLE DEFAULT 0.0,"
+                       "Created_at TEXT DEFAULT CURRENT_TIMESTAMP);";
+
+    char *err_msg = NULL;
+    int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    
+    if (rc != SQLITE_OK ) {
+        
+        fprintf(stderr, "SQL error: %s\n", err_msg);
+        
+        sqlite3_free(err_msg);        
+        sqlite3_close(db);
+        
+        return 1;
+    } 
+
+    sqlite3_close(db);
+    
+    return EXIT_SUCCESS;
 }
 
 

@@ -25,6 +25,6 @@ void open_create_account(const gchar* name, const gchar* birth, const gchar* mai
                 const gchar* phone, const gchar* city, const gchar* street,
                 const gchar* house, const gchar* zip, const gchar* password);
 
-
+int create_user_table();
 
 #endif
