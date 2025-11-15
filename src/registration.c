@@ -156,6 +156,92 @@ char* encrypt_passwort(const char* passwort) {
 }
 
 /**
+ * This function adds a user in the database and insert his datas
+ */
+int add_user(RegistrationContext *user) {
+
+    sqlite3 *db;
+    
+    int rc = sqlite3_open("test.db", &db);
+    
+    if (rc != SQLITE_OK) {
+        
+        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+        
+        return EXIT_FAILURE;
+    }
+
+    const char *sql_insert = "INSERT INTO Users "
+                         "(User_ID, Role, Username, Password, Birthdate,"
+                         "Email, City, Street, House_number, Zipcode, Balance) "
+                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+
+    sqlite3_stmt *stmt;
+    if (sqlite3_prepare_v2(db, sql_insert, -1, &stmt, 0) != SQLITE_OK) {
+        fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+        return EXIT_FAILURE;
+    }
+
+    // Generate user ID
+    sqlite3_stmt *id_stmt;
+    if (sqlite3_prepare_v2(db, "SELECT MAX(ID) FROM Users;", -1, &id_stmt, NULL) != SQLITE_OK) {
+        fprintf(stderr, "Failed to prepare ID query: %s\n", sqlite3_errmsg(db));
+        sqlite3_finalize(stmt);
+        sqlite3_close(db);
+        return EXIT_FAILURE;
+    }
+
+    sqlite3_step(id_stmt);
+    sqlite3_int64 max_id = sqlite3_column_int64(id_stmt, 0);
+    sqlite3_finalize(id_stmt);
+
+    char User_ID[32];
+    snprintf(User_ID, sizeof(User_ID), "CUST%08lld", max_id + 1);
+
+    // Extract text from entries
+    const gchar *name     = gtk_entry_get_text(GTK_ENTRY(user->name_entry));
+    const gchar *password = gtk_entry_get_text(GTK_ENTRY(user->password_entry));
+    char *hash_password = encrypt_passwort(password);
+    if(!hash_password) {
+        fprintf(stderr, "Password hashing failed.\n");
+        return EXIT_FAILURE;
+    }
+    const gchar *birth    = gtk_entry_get_text(GTK_ENTRY(user->birth_entry));
+    const gchar *email    = gtk_entry_get_text(GTK_ENTRY(user->email_entry));
+    const gchar *city     = gtk_entry_get_text(GTK_ENTRY(user->city_entry));
+    const gchar *street   = gtk_entry_get_text(GTK_ENTRY(user->street_entry));
+    const gchar *house    = gtk_entry_get_text(GTK_ENTRY(user->house_entry));
+    const gchar *zip      = gtk_entry_get_text(GTK_ENTRY(user->zip_entry));
+
+    sqlite3_bind_text(stmt, 1, User_ID, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, "Client", -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, name, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 4, hash_password, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 5, birth, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 6, email, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 7, city, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 8, street, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 9, house, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 10, zip, -1, SQLITE_STATIC);
+    sqlite3_bind_double(stmt, 11, 0.0);  // Initial balance
+
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        fprintf(stderr, "Insert failed: %s\n", sqlite3_errmsg(db));
+        return EXIT_FAILURE;
+    }
+
+    sqlite3_finalize(stmt);
+
+    sqlite3_close(db);
+    free(hash_password);
+
+    return EXIT_SUCCESS;
+
+}
+
+/**
  * This function is called to create the user account
  * after the inputs validation are all correct
  */

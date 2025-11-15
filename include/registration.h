@@ -27,5 +27,6 @@ void open_create_account(const gchar* name, const gchar* birth, const gchar* mai
 
 int create_user_table();
 char* encrypt_passwort(const char* passwort);
+int add_user(RegistrationContext *user);
 
 #endif
