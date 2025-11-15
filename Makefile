@@ -1,7 +1,7 @@
 # Compiler and flags
 CC = gcc
 CFLAGS = -Wall -Wextra -Iinclude $(shell pkg-config --cflags gtk+-3.0)
-LIBS = $(shell pkg-config --libs gtk+-3.0) -lsqlite3
+LIBS = $(shell pkg-config --libs gtk+-3.0) -lsqlite3 libs/bcrypt.a
 
 # Directories
 SRC_DIR = src
