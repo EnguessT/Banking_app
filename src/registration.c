@@ -295,6 +295,55 @@ int operation_made() {
     } 
 
     sqlite3_close(db);
+    
+    return EXIT_SUCCESS;
+}
+
+/**
+ * THis function insert user operation in 
+ * the operation database
+ */
+int log_operation(sqlite3 *db, sqlite3_int64 user_id, OperationType type, double amount) {
+    const char *sql = "INSERT INTO operations (user_id, type, amount, description) VALUES (?, ?, ?, ?);";
+    sqlite3_stmt *stmt;
+
+    const char *op_descriptions[] = {
+        "New user registered",
+        "User logged in",
+        "User made a deposit",
+        "User made a withdraw",
+        "User made a transfer",
+        "User updated their profile",
+        "Admin checked database",
+        "User Logged out"
+    };
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, 0) != SQLITE_OK) {
+        fprintf(stderr, "Failed to prepare operation log: %s\n", sqlite3_errmsg(db));
+        return 1;
+    }
+
+    const char *type_str = NULL;
+    switch (type) {
+        case REGISTRATION:      type_str = "registration"; break;
+        case LOGIN:             type_str = "login"; break;
+        case DEPOSIT:           type_str = "deposit"; break;
+        case WITHDRAW:          type_str = "withdraw"; break;
+        case TRANSFERT:         type_str = "transfert"; break;
+        case PROFILE_UPDATE:    type_str = "profile_update"; break;
+        case DATABASE_CHECKING: type_str = "database_checking"; break;
+        case LOGOUT:            type_str = "logout"; break;
+        default:                type_str = "unknown"; break;
+    }
+
+    sqlite3_bind_int64(stmt, 1, user_id);
+    sqlite3_bind_text(stmt, 2, type_str, -1, SQLITE_STATIC);
+    sqlite3_bind_double(stmt, 3, amount);
+    sqlite3_bind_text(stmt, 4, op_descriptions[type], -1, SQLITE_STATIC);
+
+    int rc = sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+    return rc == SQLITE_DONE ? 0 : 1;
 }
 
 /**

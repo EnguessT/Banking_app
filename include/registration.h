@@ -2,6 +2,7 @@
 #define REGISTRATION_H
 //#include <gtk/gtk.h>
 #include <stdbool.h>
+#include <sqlite3.h>
 #include "widgets.h"
 
 typedef struct{
@@ -17,6 +18,17 @@ typedef struct{
     GtkWidget *re_password_entry;
 }RegistrationContext;
 
+typedef enum {
+    REGISTRATION,
+    LOGIN,
+    DEPOSIT,
+    WITHDRAW,
+    TRANSFERT,
+    PROFILE_UPDATE,
+    DATABASE_CHECKING,
+    LOGOUT
+} OperationType;
+
 void is_valid_operation(const gchar* input, const char *re_expression, const char *dialog_message);
 void show_warning_dialog(const char *message);
 void open_signup_window(void);
@@ -29,5 +41,6 @@ int create_user_table();
 char* encrypt_passwort(const char* passwort);
 int add_user(RegistrationContext *user);
 int operation_made();
+int log_operation(sqlite3 *db, sqlite3_int64 user_id, OperationType type, double amount);
 
 #endif
