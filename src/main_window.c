@@ -65,22 +65,27 @@ int authenticate_user(const char* identifier, const char* password_input) {
 
 //extract the text and call your open_connect_window():
 void on_login_clicked(GtkWidget *button, gpointer user_data) {
+    (void) button;
     LoginContext *ctx = (LoginContext *)user_data;
 
-    const gchar *username = gtk_entry_get_text(GTK_ENTRY(ctx->username_entry));
+    const gchar *identifier = gtk_entry_get_text(GTK_ENTRY(ctx->user_entry));
     const gchar *password = gtk_entry_get_text(GTK_ENTRY(ctx->password_entry));
 
-    if (g_strcmp0(username, "") == 0 || g_strcmp0(password, "") == 0) {
-        GtkWidget *dialog = gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_toplevel(button)),
-            GTK_DIALOG_MODAL, GTK_MESSAGE_WARNING, GTK_BUTTONS_OK,
-            "Please enter both username and password.");
-        gtk_dialog_run(GTK_DIALOG(dialog));
-        gtk_widget_destroy(dialog);
-        
-        return;
+    if (g_strcmp0(identifier, "") == 0 || g_strcmp0(password, "") == 0) {
+        show_warning_dialog("Please enter both username and password.");
+         return;
     }
 
-    open_connect_window(username, password);  //custom function
+    int auth_result = authenticate_user(identifier, password);
+    if(auth_result > 0) {
+
+    } else if(auth_result == 0) {
+        show_warning_dialog("Incorrect password.");
+    } else {
+        show_warning_dialog("Login failed. PLease try again");
+    }
+
+    open_connect_window(identifier, password);  //custom function
     //g_free(ctx);  // When done with ctx and not using it again
 }
 
@@ -139,14 +144,14 @@ GtkWidget* create_main_window(void){
     GtkWidget *user_label = set_label(u_label);
 
     // Username entry
-    GtkWidget *username_entry = create_entry("Username");
+    GtkWidget *user_entry = create_entry("User_ID or Email");
 
     // Password entry
     GtkWidget *password_entry = create_entry("Password");
 
     //connect the signal
     LoginContext *ctx = g_new(LoginContext, 1);
-    ctx->username_entry = username_entry;
+    ctx->user_entry = user_entry;
     ctx->password_entry = password_entry;
 
     //create login button
@@ -170,7 +175,7 @@ GtkWidget* create_main_window(void){
     
     gtk_box_pack_start(GTK_BOX(right_box), profile_image, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(right_box), user_label, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(right_box), username_entry, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(right_box), user_entry, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(right_box), password_entry, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(right_box), login_button, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(right_box), remember, FALSE, FALSE, 0);

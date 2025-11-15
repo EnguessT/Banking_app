@@ -3,7 +3,7 @@
 #include <gtk/gtk.h>
 
 typedef struct {
-    GtkWidget *username_entry;
+    GtkWidget *user_entry;
     GtkWidget *password_entry;
 }LoginContext;
 
