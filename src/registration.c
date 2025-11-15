@@ -439,9 +439,16 @@ void on_create_clicked(GtkWidget *button, gpointer user_infos) {
         sqlite3_close(db_user); 
         return;
     }
+    
 
     //show a dialog window for account creation success
     show_warning_dialog("Account created successfully!");
+
+    //transmit the user his User_ID
+    char Id_buffer[200];
+    sprintf(Id_buffer, "Your user ID is: CUST%08lld\nPlease keep it carefully.\n You need it to login.",
+                        new_user_id);
+    show_warning_dialog(Id_buffer);
 
     //Zero out passwort from memory
     for(size_t i = 0; password[i] != '\0'; ++i) {
