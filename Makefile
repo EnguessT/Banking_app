@@ -1,7 +1,7 @@
 # Compiler and flags
 CC = gcc
 CFLAGS = -Wall -Wextra -Iinclude $(shell pkg-config --cflags gtk+-3.0)
-LIBS = $(shell pkg-config --libs gtk+-3.0)
+LIBS = $(shell pkg-config --libs gtk+-3.0) -lsqlite3
 
 # Directories
 SRC_DIR = src
@@ -34,7 +34,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 
 # Run the app
 run: $(TARGET)
-	@./$(TARGET)
+	@./$(TARGET) $(OBJ_DIR)/*.o
 
 # Clean build artifacts
 clean:
