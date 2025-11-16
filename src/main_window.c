@@ -85,8 +85,26 @@ void on_login_clicked(GtkWidget *button, gpointer user_data) {
     if(auth_result == 1) {
         if(strcmp(auth.role,"Admin") == 0) {
             open_admin_window();
+            //log the operation
+            sqlite3 *db_operation;
+            if (sqlite3_open("operations.db", &db_operation) != SQLITE_OK) {
+                fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db_operation));
+                return;
+            }
+    
+            log_operation(db_operation, auth.id, 2, 0.0);
+
         } else if(strcmp(auth.role, "Client") == 0) {
             open_client_window();
+              //log the operation
+            sqlite3 *db_operation;
+            if (sqlite3_open("operations.db", &db_operation) != SQLITE_OK) {
+                fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db_operation));
+                return;
+            }
+    
+            log_operation(db_operation, auth.id, 2, 0.0);
+
         } else {
             show_warning_dialog("Unknown role. Access denied.");
         }
