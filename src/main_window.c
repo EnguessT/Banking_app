@@ -5,18 +5,17 @@
 #include <bcrypt.h>
 
 
-//when link button is clicked
+/**
+ * THis function is called when the link for password forgot 
+ * is clicked, it created a window for initialising 
+ * the user passwort
+ */
 gboolean on_link_clicked(GtkLinkButton *button, gpointer user_data) {
 
     (void)button;
     (void) user_data;
-
-    GtkWidget *dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL,
-        GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "Password recovery coming soon!");
-    gtk_dialog_run(GTK_DIALOG(dialog));
-    gtk_widget_destroy(dialog);
-
-    return TRUE;  // Prevent default URI opening
+    show_warning_dialog("Password recovery coming soon!");
+    return TRUE; 
 }
 
 /**
@@ -72,7 +71,7 @@ void on_login_clicked(GtkWidget *button, gpointer user_data) {
     const gchar *password = gtk_entry_get_text(GTK_ENTRY(ctx->password_entry));
 
     if (g_strcmp0(identifier, "") == 0 || g_strcmp0(password, "") == 0) {
-        show_warning_dialog("Please enter both username and password.");
+        show_warning_dialog("Please enter User_ID/Email and password.");
          return;
     }
 
@@ -85,15 +84,32 @@ void on_login_clicked(GtkWidget *button, gpointer user_data) {
         show_warning_dialog("Login failed. PLease try again");
     }
 
-    open_connect_window(identifier, password);  //custom function
+    open_connect_window();  
     //g_free(ctx);  // When done with ctx and not using it again
 }
 
-void open_connect_window(const gchar* name, const gchar* pass) {
-    printf("name: %s\n", name);
-    printf("passwort: %s\n", pass);
+/**
+ * This function create a User window after 
+ * login was successful
+ */
+void open_connect_window(void) {
+    GtkWidget *user_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_position(GTK_WINDOW(user_window), GTK_WIN_POS_CENTER);
+    gtk_window_set_resizable(GTK_WINDOW(user_window), FALSE);
+    gtk_window_set_title(GTK_WINDOW(user_window), "Bank Account");
+    gtk_container_set_border_width(GTK_CONTAINER(user_window), 10);
+
+    gtk_window_set_default_size(GTK_WINDOW(user_window), 800, 500);
+    g_signal_connect(user_window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    gtk_widget_show_all(user_window);
+
+	gtk_main();
 }
 
+
+/**
+ * This function create the Main window 
+ */
 GtkWidget* create_main_window(void){
 
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
