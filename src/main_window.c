@@ -2,6 +2,7 @@
 #include "widgets.h"
 #include "registration.h"
 #include <sqlite3.h>
+#include <string.h>
 #include <bcrypt.h>
 
 
@@ -23,14 +24,14 @@ gboolean on_link_clicked(GtkLinkButton *button, gpointer user_data) {
  * taking the User_ID or Email and Password
  * and checking if it is found in the database
  */
-int authenticate_user(const char* identifier, const char* password_input) {
+int authenticate_user(const char* identifier, const char* password_input, AuthResult *output) {
     sqlite3 *db_user;
     if (sqlite3_open("users.db", &db_user) != SQLITE_OK) {
         fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db_user));
         return -1;
     }
 
-    const char *sql = "SELECT ID, User_ID, Password "
+    const char *sql = "SELECT ID, User_ID, Password, Role "
                       "FROM Users WHERE User_ID = ? OR Email = ?;";
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db_user, sql, -1, &stmt, NULL) != SQLITE_OK) {
@@ -46,11 +47,16 @@ int authenticate_user(const char* identifier, const char* password_input) {
     int result = -1;
     if (sqlite3_step(stmt) == SQLITE_ROW) {
         sqlite3_int64 id = sqlite3_column_int64(stmt, 0);
+        const char *user_id     = (const char *)sqlite3_column_text(stmt, 1);
         const char *stored_hash = (const char *)sqlite3_column_text(stmt, 2);
+        const char *role        = (const char *)sqlite3_column_text(stmt, 3);
 
          if (bcrypt_checkpw(password_input, stored_hash) == 0) {
             //login successful
-            result = (int)id;
+            output->id = id;
+            strncpy(output->user_id, user_id, sizeof(output->user_id));
+            strncpy(output->role, role, sizeof(output->role));
+            result = 1;
          } else {
             //wrong passord
             result = 0;
@@ -74,9 +80,16 @@ void on_login_clicked(GtkWidget *button, gpointer user_data) {
         show_warning_dialog("Please enter User_ID/Email and password.");
          return;
     }
-
-    int auth_result = authenticate_user(identifier, password);
-    if(auth_result > 0) {
+    AuthResult auth;
+    int auth_result = authenticate_user(identifier, password, &auth);
+    if(auth_result == 1) {
+        if(strcmp(auth.role,"Admin") == 0) {
+            open_admin_window();
+        } else if(strcmp(auth.role, "Client") == 0) {
+            open_client_window();
+        } else {
+            show_warning_dialog("Unknown role. Access denied.");
+        }
 
     } else if(auth_result == 0) {
         show_warning_dialog("Incorrect password.");
@@ -84,15 +97,14 @@ void on_login_clicked(GtkWidget *button, gpointer user_data) {
         show_warning_dialog("Login failed. PLease try again");
     }
 
-    open_connect_window();  
     //g_free(ctx);  // When done with ctx and not using it again
 }
 
 /**
- * This function create a User window after 
+ * This function opens Client window after 
  * login was successful
  */
-void open_connect_window(void) {
+void open_client_window(void) {
     GtkWidget *user_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_position(GTK_WINDOW(user_window), GTK_WIN_POS_CENTER);
     gtk_window_set_resizable(GTK_WINDOW(user_window), FALSE);
@@ -106,6 +118,13 @@ void open_connect_window(void) {
 	gtk_main();
 }
 
+/**
+ * This function opens a Admin window after 
+ * login was successful and role Admin was proved
+ */
+void  open_admin_window() {
+
+}
 
 /**
  * This function create the Main window 
