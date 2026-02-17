@@ -1,7 +1,7 @@
 #ifndef MAIN_WINDOW_H
 #define MAIN_WINDOW_H
 #include <sqlite3.h>
-#include <gtk/gtk.h>
+#include <gtk-3.0/gtk/gtk.h>
 
 typedef struct {
     GtkWidget *user_entry;
