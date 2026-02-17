@@ -1,7 +1,6 @@
 #ifndef WIDGETS_H
 #define WIDGETS_H
-#include <gtk/gtk.h>
-
+#include <gtk-3.0/gtk/gtk.h>
 
 void set_background_color(GtkWidget* rbox);
 void set_background_image(GtkWidget* lbox);
