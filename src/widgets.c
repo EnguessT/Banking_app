@@ -46,6 +46,8 @@ GtkWidget* set_image(const char* filename, int width, int height) {
     GtkWidget *image = gtk_image_new_from_pixbuf(pixbuf);
     gtk_widget_set_margin_top(image, 10);
 
+    g_object_unref(pixbuf); 
+
     return image;
 }
 
