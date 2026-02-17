@@ -110,7 +110,7 @@ int create_user_table() {
                        "Username TEXT NOT NULL COLLATE NOCASE,"
                        "Password TEXT NOT NULL,"
                        "Birth_date TEXT,"
-                       "Email TEXT UNIQUE NOT NULL COLLATE NOCASE"
+                       "Email TEXT UNIQUE NOT NULL COLLATE NOCASE,"
                        "City TEXT ,"
                        "Street TEXT,"
                        "House_number TEXT,"
@@ -161,20 +161,21 @@ char* encrypt_passwort(const char* passwort) {
 sqlite3_int64 add_user(sqlite3 *db, RegistrationContext *user) {
 
     const char *sql_insert = "INSERT INTO Users "
-                         "(User_ID, Role, Username, Password, Birthdate,"
+                         "(Role, Username, Password, Birth_date,"
                          "Email, City, Street, House_number, Zipcode, Balance) "
-                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-
+                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                         
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db, sql_insert, -1, &stmt, 0) != SQLITE_OK) {
         fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db));
+        sqlite3_finalize(stmt);
         sqlite3_close(db);
         return -1;
     }
 
     // Generate user ID
     sqlite3_stmt *id_stmt;
-    if (sqlite3_prepare_v2(db, "SELECT MAX(ID) FROM Users;", -1, &id_stmt, NULL) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, "SELECT MAX(User_ID) FROM Users;", -1, &id_stmt, NULL) != SQLITE_OK) {
         fprintf(stderr, "Failed to prepare ID query: %s\n", sqlite3_errmsg(db));
         sqlite3_finalize(stmt);
         sqlite3_close(db);
@@ -203,20 +204,20 @@ sqlite3_int64 add_user(sqlite3 *db, RegistrationContext *user) {
     const gchar *house    = gtk_entry_get_text(GTK_ENTRY(user->house_entry));
     const gchar *zip      = gtk_entry_get_text(GTK_ENTRY(user->zip_entry));
 
-    sqlite3_bind_text(stmt, 1, User_ID, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 2, "Client", -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 3, name, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 4, hash_password, -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(stmt, 5, birth, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 6, email, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 7, city, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 8, street, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 9, house, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 10, zip, -1, SQLITE_STATIC);
-    sqlite3_bind_double(stmt, 11, 0.0);  // Initial balance
+    sqlite3_bind_text(stmt, 1, "Client", -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, name, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, hash_password, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 4, birth, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 5, email, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 6, city, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 7, street, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 8, house, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 9, zip, -1, SQLITE_STATIC);
+    sqlite3_bind_double(stmt, 10, 0.0);  // Initial balance
 
     if (sqlite3_step(stmt) != SQLITE_DONE) {
         fprintf(stderr, "Insert failed: %s\n", sqlite3_errmsg(db));
+        sqlite3_finalize(stmt);
         return EXIT_FAILURE;
     }
 
@@ -252,13 +253,13 @@ void open_create_account(const gchar* name, const gchar* birth, const gchar* mai
  */
 int operation_made() {
     sqlite3 *db;
-    if (sqlite3_open("opeartions.db", &db) != SQLITE_OK) {
+    if (sqlite3_open("operations.db", &db) != SQLITE_OK) {
         fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
         sqlite3_close(db);
         return EXIT_FAILURE;
     }
 
-    const char *sql = "CREATE TABLE IF NOT EXISTS operations ("
+    const char *sql = "CREATE TABLE IF NOT EXISTS Operations ("
                       "Operation_id INTEGER PRIMARY KEY AUTOINCREMENT,"
                       "User_id INTEGER NOT NULL,"                    
                       "Type TEXT NOT NULL,"                          
@@ -290,7 +291,7 @@ int operation_made() {
  * the operation database
  */
 int log_operation(sqlite3 *db, sqlite3_int64 user_id, OperationType type, double amount) {
-    const char *sql = "INSERT INTO operations (user_id, type, amount, description) VALUES (?, ?, ?, ?);";
+    const char *sql = "INSERT INTO operations (User_id, Type, Amount, Description) VALUES (?, ?, ?, ?);";
     sqlite3_stmt *stmt;
 
     const char *op_descriptions[] = {
@@ -559,7 +560,7 @@ void open_signup_window(void) {
     RegistrationContext *rtx = g_new(RegistrationContext, 1);
     rtx->name_entry = name_entry;
     rtx->birth_entry = birth_entry;
-    rtx->email_entry = city_entry;
+    rtx->email_entry = mail_entry;
     rtx->phone_entry = number_entry;
     rtx->city_entry = city_entry;
     rtx->street_entry = street_entry;
