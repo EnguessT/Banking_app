@@ -1,6 +1,6 @@
-#include"main_window.h"
-#include "widgets.h"
-#include "registration.h"
+#include"include/main_window.h"
+#include "include/widgets.h"
+#include "include/registration.h"
 #include <sqlite3.h>
 #include <string.h>
 #include <bcrypt.h>
@@ -31,30 +31,46 @@ int authenticate_user(const char* identifier, const char* password_input, AuthRe
         return -1;
     }
 
-    const char *sql = "SELECT ID, User_ID, Password, Role "
+    const char *sql = "SELECT User_ID, Password, Role "
                       "FROM Users WHERE User_ID = ? OR Email = ?;";
     sqlite3_stmt *stmt;
     if (sqlite3_prepare_v2(db_user, sql, -1, &stmt, NULL) != SQLITE_OK) {
         fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db_user));
+        sqlite3_finalize(stmt);
         sqlite3_close(db_user);
         return -1;
     }
 
-    // Bind the same identifier to both fields
-    sqlite3_bind_text(stmt, 1, identifier, -1, SQLITE_STATIC);
+    // Bind the same identifier to both fields, 4
+    long long numeric_id = -1;
+    if (strncmp(identifier, "CUST", 4) == 0) {
+        char *endptr;
+        numeric_id = strtoll(identifier + 4, &endptr, 10);
+
+        if (*endptr == '\0') {
+            sqlite3_bind_int64(stmt, 1, numeric_id);
+        } else {
+            sqlite3_bind_null(stmt, 1);
+        }
+    } else {
+        sqlite3_bind_null(stmt, 1);
+    }
+
     sqlite3_bind_text(stmt, 2, identifier, -1, SQLITE_STATIC);
 
     int result = -1;
     if (sqlite3_step(stmt) == SQLITE_ROW) {
-        sqlite3_int64 id = sqlite3_column_int64(stmt, 0);
-        const char *user_id     = (const char *)sqlite3_column_text(stmt, 1);
-        const char *stored_hash = (const char *)sqlite3_column_text(stmt, 2);
-        const char *role        = (const char *)sqlite3_column_text(stmt, 3);
+        sqlite3_int64 user_id = sqlite3_column_int64(stmt, 0);
+        //const char *user_id     = (const char *)sqlite3_column_text(stmt, 1);
+        const char *stored_hash = (const char *)sqlite3_column_text(stmt, 1);
+        const char *role        = (const char *)sqlite3_column_text(stmt, 2);
 
          if (bcrypt_checkpw(password_input, stored_hash) == 0) {
             //login successful
-            output->id = id;
-            strncpy(output->user_id, user_id, sizeof(output->user_id));
+            output->id = user_id;
+            char cust_id[32];
+            snprintf(cust_id, sizeof(cust_id), "CUST%08lld", user_id);
+            strncpy(output->user_id, cust_id, sizeof(output->user_id));
             strncpy(output->role, role, sizeof(output->role));
             result = 1;
          } else {
@@ -75,6 +91,7 @@ void on_login_clicked(GtkWidget *button, gpointer user_data) {
 
     const gchar *identifier = gtk_entry_get_text(GTK_ENTRY(ctx->user_entry));
     const gchar *password = gtk_entry_get_text(GTK_ENTRY(ctx->password_entry));
+
 
     if (g_strcmp0(identifier, "") == 0 || g_strcmp0(password, "") == 0) {
         show_warning_dialog("Please enter User_ID/Email and password.");
@@ -201,6 +218,7 @@ GtkWidget* create_main_window(void){
 
     // Password entry
     GtkWidget *password_entry = create_entry("Password");
+    gtk_entry_set_visibility(GTK_ENTRY(password_entry), FALSE);
 
     //connect the signal
     LoginContext *ctx = g_new(LoginContext, 1);
