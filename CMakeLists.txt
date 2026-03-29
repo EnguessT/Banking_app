@@ -19,7 +19,7 @@ set(SOURCES
     src/main_window.c
     src/main.c
 	src/registration.c
-	src/widget.c
+	src/widgets.c
 )
 
 # Executable
