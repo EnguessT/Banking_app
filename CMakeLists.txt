@@ -16,10 +16,15 @@ include_directories(
 
 # Source files
 set(SOURCES
-    src/main_window.c
+    src/ui/main_window.c
+    src/ui/client_window.c
+    src/ui/admin_window.c
+    src/ui/registration.c
+	src/ui/widgets.c
+	src/db/database_context.c
+	src/core/buttons_callback.c
+	src/core/verifications.c
     src/main.c
-	src/registration.c
-	src/widgets.c
 )
 
 # Executable

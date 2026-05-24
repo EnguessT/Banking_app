@@ -6,6 +6,7 @@ final
 # Ignore build folders
 /build/
 bin/
+obj/
 
 # Ignore editor files
 *.swp

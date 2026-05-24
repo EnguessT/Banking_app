@@ -10,6 +10,7 @@ GtkWidget* set_label(const gchar *label_markup);
 GtkWidget* create_entry(const gchar *entry_label);
 GtkWidget* create_button(const gchar *button_label);
 GtkWidget* create_link_button(const gchar *link_label);
+void show_warning_dialog(const char *message);
 
 
 #endif
