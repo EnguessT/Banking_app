@@ -42,7 +42,7 @@ void on_login_clicked(GtkWidget *button, gpointer user_data) {
             log_operation(db_operation, auth.id, 1, 0.0);
 
         } else if(strcmp(auth.role, "Client") == 0) {
-            open_client_window(button, user_data);
+            open_client_window(button, NULL);
               //log the operation
             sqlite3 *db_operation;
             if (sqlite3_open("databases/operations.db", &db_operation) != SQLITE_OK) {

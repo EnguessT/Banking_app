@@ -4,9 +4,10 @@
  * This function opens Client window after 
  * login was successful
  */
-void open_client_window(GtkWidget* button, gpointer data) {
-    (void)button;
-    GtkWindow *parent = GTK_WINDOW(data);
+void open_client_window(GtkWidget *button, gpointer user_data) {
+    // Get the parent window from the button
+    (void)user_data;
+    GtkWindow *parent = GTK_WINDOW(gtk_widget_get_toplevel(button));
     GtkApplication *app =
         GTK_APPLICATION(gtk_window_get_application(parent));
 
@@ -15,12 +16,11 @@ void open_client_window(GtkWidget* button, gpointer data) {
     gtk_window_set_resizable(GTK_WINDOW(user_window), FALSE);
     gtk_window_set_title(GTK_WINDOW(user_window), "Bank Account");
     gtk_container_set_border_width(GTK_CONTAINER(user_window), 10);
-
     gtk_window_set_default_size(GTK_WINDOW(user_window), 800, 500);
 
     //create parent box container
-    GtkWidget *parent_box = gtk_box_new(0, 5);
-	gtk_container_add(GTK_CONTAINER(user_window), parent_box);
+    //GtkWidget *parent_box = gtk_box_new(0, 5);
+	//gtk_container_add(GTK_CONTAINER(user_window), parent_box);
 
 
     //Create a stack sidebar
@@ -50,44 +50,41 @@ void open_client_window(GtkWidget* button, gpointer data) {
     gtk_box_pack_start(GTK_BOX(box), stack, TRUE, TRUE, 0);
 
     gtk_container_add(GTK_CONTAINER(user_window), box);
-    //gtk_window_set_titlebar(GTK_WINDOW(win), header);
 
     gtk_widget_show_all(user_window);
 
-	gtk_main();
 }
 
-
 GtkWidget* user_stack() {
-  GtkWidget *stack = g_object_new(
-            GTK_TYPE_STACK,
-            "visible", TRUE,
-            "transition-type", GTK_STACK_TRANSITION_TYPE_SLIDE_LEFT_RIGHT,
-            NULL
-  );
-
-  const char* user_stack_label[4] = {"Dashboard", "Payments", "TRansactions", "settings"};
-
-  for (int i = 0; i < 4; i++) {
-    char label[56], title[7], name[6];
-
-    sprintf(label, "<span size='xx-large' font_weight='bold'>%s</span>", user_stack_label[i]);
-    sprintf(title, "%s", user_stack_label[i]);
-    sprintf(name, "%s", user_stack_label[i]);
-
-    gtk_stack_add_titled(
-      GTK_STACK(stack),
-      g_object_new(
-        GTK_TYPE_LABEL,
+    GtkWidget *stack = g_object_new(
+        GTK_TYPE_STACK,
         "visible", TRUE,
-        "label", label,
-        "use-markup", TRUE,
+        "transition-type", GTK_STACK_TRANSITION_TYPE_SLIDE_LEFT_RIGHT,
         NULL
-      ),
-      name,
-      title
     );
-  }
 
-  return stack;
+    const char* user_stack_label[4] = {"Dashboard", "Payments", "Transactions", "Settings"};
+
+    for (int i = 0; i < 4; i++) {
+        char label[128];
+
+        sprintf(label,
+                "<span size='xx-large' font_weight='bold'>%s</span>",
+                user_stack_label[i]);
+
+        gtk_stack_add_titled(
+            GTK_STACK(stack),
+            g_object_new(
+                GTK_TYPE_LABEL,
+                "visible", TRUE,
+                "label", label,
+                "use-markup", TRUE,
+                NULL
+            ),
+            user_stack_label[i],   
+            user_stack_label[i]    
+        );
+    }
+
+    return stack;
 }
