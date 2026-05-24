@@ -3,6 +3,6 @@
 
 #include <gtk-3.0/gtk/gtk.h>
 
-void  open_admin_window();
+void  open_admin_window(GtkWidget *button, gpointer data);
 
 #endif

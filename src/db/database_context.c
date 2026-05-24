@@ -195,8 +195,8 @@ int log_operation(sqlite3 *db, sqlite3_int64 user_id, OperationType type, double
         "User logged in",
         "User made a deposit",
         "User made a withdraw",
-        "User updated their profile",
         "User made a transfer",
+        "User updated their profile",
         "Admin checked database",
         "User Logged out"
     };

@@ -1,0 +1,81 @@
+/* LEFT BOX */
+.left-box {
+    background-image: url("images/background.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100% auto;
+    background-color: #0165BD;   
+    padding: 20px;
+    border-radius: 15px;
+}
+
+/* RIGHT BOX */
+.right-box {
+    background-color: #0165BD;
+    padding: 20px;
+    border-radius: 15px;
+}
+
+/* LABELS */
+.big-label {
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* ENTRY */
+.entry {
+    background-color: white;
+    border-radius: 10px;
+    padding: 8px;
+    border: 1px solid #ccc;
+}
+
+/* BUTTON */
+.button {
+    background-color: #ffffff;
+    color: #ff6f61;
+    font-weight: bold;
+    border-radius: 20px;
+    padding: 10px 20px;
+    border: none;
+}
+
+/* LINK BUTTON */
+.passwort-style {
+    font-family: Sans;
+    font-size: 12pt;
+    font-weight: bold;
+    color: gray;
+    text-decoration: underline;
+    background-color: transparent;
+    border: none;
+}
+
+/* MAIN-BOX*/
+.main-box {
+    background-image: linear-gradient(to bottom right, #0165BD, #ffb88c);
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.title {
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+}
+        
+.create-button {
+    background-color: #ffffff;
+    color: #ff6f61;
+    font-weight: bold;
+    border-radius: 20px;
+    padding: 10px 20px;
+    border: none;
+ }
+
+.create-button:hover {
+    background-color: #ff6f61;
+    color: white;
+}
+

@@ -8,9 +8,10 @@
 /**
  * This function create the Main window 
  */
-GtkWidget* create_main_window(void){
 
-    GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+GtkWidget* create_main_window(GtkApplication *app){
+
+    GtkWidget *window = gtk_application_window_new(app);
     //set window default position
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
     //set the window not resizable
@@ -23,16 +24,16 @@ GtkWidget* create_main_window(void){
 	gtk_window_set_default_size(GTK_WINDOW(window), 800, 500);
 
     //create parent box container
-    GtkWidget *parent_box = gtk_box_new(0, 5);
+   // GtkWidget *parent_box = gtk_box_new(0, 5);
+    GtkWidget *parent_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
 	gtk_container_add(GTK_CONTAINER(window), parent_box);
 
     //vertical left box container for  title and logo
-    GtkWidget *left_box = gtk_box_new(1, 10);
+    //GtkWidget *left_box = gtk_box_new(1, 10);
+    GtkWidget *left_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     gtk_widget_set_size_request(left_box, 300, -1); 
-    gtk_widget_set_name(left_box, "left-box");
-
-    //add an image as background
-    set_background_image(left_box);
+    gtk_style_context_add_class(gtk_widget_get_style_context(left_box),
+                        "left-box");
 
     //create an image for bank image
     GtkWidget *bank_image = set_image("images/banking.png", 70, 70);
@@ -44,11 +45,10 @@ GtkWidget* create_main_window(void){
     gtk_box_pack_start(GTK_BOX(left_box), hello_label, FALSE, FALSE, 0);
 
     //vertical right box container for user inputs
-    GtkWidget *right_box = gtk_box_new(1, 5);
-    gtk_widget_set_name(right_box, "right-box");
-
-    //set a backgroung color using css
-    set_background_color(right_box);
+    //GtkWidget *right_box = gtk_box_new(1, 5);
+    GtkWidget *right_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
+    gtk_style_context_add_class(gtk_widget_get_style_context(right_box),
+                        "right-box");
 
     //create an image for profile image
     GtkWidget *profile_image = set_image("images/profile.png", 90, 90);
@@ -82,7 +82,9 @@ GtkWidget* create_main_window(void){
 
     // Create account prompt
     GtkWidget *create = create_button("Create Account"); 
-    g_signal_connect(create, "clicked", G_CALLBACK(open_registration_window), NULL);
+    //g_signal_connect(create, "clicked", G_CALLBACK(open_registration_window), NULL);
+    g_signal_connect(create, "clicked",G_CALLBACK(open_registration_window), app);
+
 
     //no account yet label
     const gchar *label2 = "<span foreground=\"black\" size=\'x-large\'>No account yet?</span>";
@@ -106,7 +108,10 @@ GtkWidget* create_main_window(void){
     gtk_box_pack_start(GTK_BOX(parent_box), box_separator, FALSE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(parent_box), right_box, TRUE, TRUE, 0);
 
-    g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), NULL);
-
+    gtk_widget_show_all(window);
     return window;
 }
+
+
+
+

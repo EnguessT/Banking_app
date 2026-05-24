@@ -17,7 +17,6 @@ gboolean on_link_clicked(GtkLinkButton *button, gpointer user_data) {
 
 //extract the text and call your open_connect_window():
 void on_login_clicked(GtkWidget *button, gpointer user_data) {
-    (void) button;
     LoginContext *ctx = (LoginContext *)user_data;
 
     const gchar *identifier = gtk_entry_get_text(GTK_ENTRY(ctx->user_entry));
@@ -32,7 +31,7 @@ void on_login_clicked(GtkWidget *button, gpointer user_data) {
     int auth_result = authenticate_user(identifier, password, &auth);
     if(auth_result == 1) {
         if(strcmp(auth.role,"Admin") == 0) {
-            open_admin_window();
+            open_admin_window(button, user_data);
             //log the operation
             sqlite3 *db_operation;
             if (sqlite3_open("databases/operations.db", &db_operation) != SQLITE_OK) {
@@ -43,7 +42,7 @@ void on_login_clicked(GtkWidget *button, gpointer user_data) {
             log_operation(db_operation, auth.id, 1, 0.0);
 
         } else if(strcmp(auth.role, "Client") == 0) {
-            open_client_window();
+            open_client_window(button, user_data);
               //log the operation
             sqlite3 *db_operation;
             if (sqlite3_open("databases/operations.db", &db_operation) != SQLITE_OK) {
