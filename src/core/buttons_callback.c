@@ -31,7 +31,9 @@ void on_login_clicked(GtkWidget *button, gpointer user_data) {
     int auth_result = authenticate_user(identifier, password, &auth);
     if(auth_result == 1) {
         if(strcmp(auth.role,"Admin") == 0) {
-            open_admin_window(button, user_data);
+            GtkWindow *parent = GTK_WINDOW(gtk_widget_get_toplevel(button));
+            gtk_window_close(parent);
+            open_admin_window(button, NULL);
             //log the operation
             sqlite3 *db_operation;
             if (sqlite3_open("databases/operations.db", &db_operation) != SQLITE_OK) {
@@ -42,6 +44,8 @@ void on_login_clicked(GtkWidget *button, gpointer user_data) {
             log_operation(db_operation, auth.id, 1, 0.0);
 
         } else if(strcmp(auth.role, "Client") == 0) {
+            GtkWindow *parent = GTK_WINDOW(gtk_widget_get_toplevel(button));
+            gtk_window_close(parent);
             open_client_window(button, NULL);
               //log the operation
             sqlite3 *db_operation;
