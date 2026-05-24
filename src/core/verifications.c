@@ -1,4 +1,6 @@
 #include "../../include/verifications.h"
+#include "widgets.h"
+#include "bcrypt.h"
 
 /***
  * This function check if the user entry are valid
@@ -87,7 +89,7 @@ bool is_valid_birthdate(const gchar* input) {
  */
 int authenticate_user(const char* identifier, const char* password_input, AuthResult *output) {
     sqlite3 *db_user;
-    if (sqlite3_open("../databases/users.db", &db_user) != SQLITE_OK) {
+    if (sqlite3_open("databases/users.db", &db_user) != SQLITE_OK) {
         fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db_user));
         return -1;
     }

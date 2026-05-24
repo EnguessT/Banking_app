@@ -7,8 +7,9 @@
  */
 int create_user_table() {
     sqlite3 *db;
-    if (sqlite3_open("../databases/users.db", &db) != SQLITE_OK) {
-        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+    const char* user_db = "databases/users.db";
+    if (sqlite3_open(user_db, &db) != SQLITE_OK) {
+        fprintf(stderr, "Cannot open database: %s: %s\n", user_db,sqlite3_errmsg(db));
         sqlite3_close(db);
         return EXIT_FAILURE;
     }
@@ -40,7 +41,7 @@ int create_user_table() {
         return 1;
     } 
 
-    sqlite3_close(db);
+    //sqlite3_close(db);
 
     return EXIT_SUCCESS;
 }
@@ -146,8 +147,9 @@ sqlite3_int64 add_user(sqlite3 *db, RegistrationContext *user) {
  */
 int operation_made() {
     sqlite3 *db;
-    if (sqlite3_open("../databases/operations.db", &db) != SQLITE_OK) {
-        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+    const char* operation_db = "databases/operations.db";
+    if (sqlite3_open(operation_db, &db) != SQLITE_OK) {
+        fprintf(stderr, "Cannot open database: %s : %s\n", operation_db,sqlite3_errmsg(db));
         sqlite3_close(db);
         return EXIT_FAILURE;
     }
@@ -193,8 +195,8 @@ int log_operation(sqlite3 *db, sqlite3_int64 user_id, OperationType type, double
         "User logged in",
         "User made a deposit",
         "User made a withdraw",
-        "User made a transfer",
         "User updated their profile",
+        "User made a transfer",
         "Admin checked database",
         "User Logged out"
     };

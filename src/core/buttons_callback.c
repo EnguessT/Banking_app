@@ -1,4 +1,5 @@
 #include "../../include/buttons_callback.h"
+#include "widgets.h"
 
 /**
  * THis function is called when the link for password forgot 
@@ -34,23 +35,23 @@ void on_login_clicked(GtkWidget *button, gpointer user_data) {
             open_admin_window();
             //log the operation
             sqlite3 *db_operation;
-            if (sqlite3_open("../databases/operations.db", &db_operation) != SQLITE_OK) {
+            if (sqlite3_open("databases/operations.db", &db_operation) != SQLITE_OK) {
                 fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db_operation));
                 return;
             }
     
-            log_operation(db_operation, auth.id, 2, 0.0);
+            log_operation(db_operation, auth.id, 1, 0.0);
 
         } else if(strcmp(auth.role, "Client") == 0) {
             open_client_window();
               //log the operation
             sqlite3 *db_operation;
-            if (sqlite3_open("../databases/operations.db", &db_operation) != SQLITE_OK) {
+            if (sqlite3_open("databases/operations.db", &db_operation) != SQLITE_OK) {
                 fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db_operation));
                 return;
             }
     
-            log_operation(db_operation, auth.id, 2, 0.0);
+            log_operation(db_operation, auth.id, 1, 0.0);
 
         } else {
             show_warning_dialog("Unknown role. Access denied.");
@@ -161,7 +162,7 @@ void on_create_clicked(GtkWidget *button, gpointer user_infos) {
 
     //open the User database
     sqlite3 *db_user;
-    if (sqlite3_open("../databases/users.db", &db_user) != SQLITE_OK) {
+    if (sqlite3_open("databases/users.db", &db_user) != SQLITE_OK) {
         fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db_user));
         return;
     }
@@ -194,13 +195,13 @@ void on_create_clicked(GtkWidget *button, gpointer user_infos) {
 
     //log the operation
     sqlite3 *db_operation;
-    if (sqlite3_open("../databases/operations.db", &db_operation) != SQLITE_OK) {
+    if (sqlite3_open("databases/operations.db", &db_operation) != SQLITE_OK) {
         fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db_operation));
         sqlite3_close(db_user);
         return;
     }
     
-    log_operation(db_operation, new_user_id, 1, 0.0);
+    log_operation(db_operation, new_user_id, 0, 0.0);
 
     //close the databases
     sqlite3_close(db_user);

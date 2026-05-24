@@ -1,6 +1,6 @@
 #include "../../include/registration.h"
 #include "../../include/buttons_callback.h"
-
+#include "widgets.h"
 
 /**
  * This function is called to create the user account
