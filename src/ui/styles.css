@@ -33,7 +33,8 @@
 
 /* BUTTON */
 .button {
-    background-color: #ffffff;
+    all: unset;
+    background-color: #B8B3B2;
     color: #ff6f61;
     font-weight: bold;
     border-radius: 20px;
@@ -55,7 +56,7 @@
 /* MAIN-BOX*/
 .main-box {
     background-image: linear-gradient(to bottom right, #0165BD, #ffb88c);
-    padding: 20px;
+    padding: 10px;
     border-radius: 15px;
 }
 
@@ -66,7 +67,7 @@
 }
         
 .create-button {
-    background-color: #ffffff;
+    background-color: #4D4443;
     color: #ff6f61;
     font-weight: bold;
     border-radius: 20px;
@@ -79,3 +80,15 @@
     color: white;
 }
 
+.toolbar {
+    background-image: linear-gradient(to bottom right, #0165BD, #ffb88c);
+    padding: 0;
+    margin: 5px;
+    min-height: 28px; 
+    border-radius: 10px;  
+}
+
+.toolbutton {
+    padding: 0;
+    margin: 0;
+}
