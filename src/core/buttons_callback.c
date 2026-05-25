@@ -1,5 +1,10 @@
 #include "../../include/buttons_callback.h"
 #include "widgets.h"
+#include "verifications.h"
+#include "admin_window.h"
+#include "client_window.h"
+#include "database_context.h"
+#include "registration.h"
 
 /**
  * THis function is called when the link for password forgot 
