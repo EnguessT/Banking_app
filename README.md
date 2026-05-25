@@ -28,6 +28,6 @@ A simple banking application written in C with sqlite3 for database and GTK-3 fo
 
 * Application
 
-    ![Main Page](images/main-page.png)
+    ![Main Page](https://github.com/EnguessT/Banking_app/blob/main/images/main-page.png)
 
-    ![Client Page](images/client-page.png)
+    ![Client Page](https://github.com/EnguessT/Banking_app/blob/main/images/client-page.png)
