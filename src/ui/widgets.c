@@ -88,3 +88,5 @@ void show_warning_dialog(const char *message) {
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
 }
+
+
