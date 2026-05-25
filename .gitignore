@@ -7,6 +7,7 @@ final
 /build/
 bin/
 obj/
+images/
 
 # Ignore editor files
 *.swp
