@@ -3,7 +3,7 @@
 #include "buttons_callback.h"
 
 /**
- * This function opens Client window after 
+ * @brief This function opens Client window after 
  * login was successful
  */
 void open_client_window(GtkWidget *button, gpointer user_data) {
@@ -88,8 +88,8 @@ GtkWidget* user_stack() {
         NULL
     );
 
-     // DASHBOARD PAGE
-    GtkWidget *dashboard = create_stack_page("images/wallet.png", "Dashboard");
+    // DASHBOARD PAGE
+    GtkWidget *dashboard = create_stack_page("images/dashboard.png", "Dashboard");
     gtk_stack_add_titled(GTK_STACK(stack), dashboard, "Dashboard", "Dashboard");
 
     // PAYMENTS PAGE
