@@ -5,6 +5,7 @@
 #include "client_window.h"
 #include "database_context.h"
 #include "registration.h"
+#include "main_window.h"
 
 /**
  * THis function is called when the link for password forgot 
@@ -219,4 +220,17 @@ void on_create_clicked(GtkWidget *button, gpointer user_infos) {
     gtk_widget_destroy(window);
 
     g_free(rtx); 
+}
+
+void on_logout_clicked(GtkWidget *button, gpointer user_data) {
+    (void)user_data;
+    GtkWindow *window = GTK_WINDOW(gtk_widget_get_toplevel(button));
+    GtkApplication *app =
+        GTK_APPLICATION(gtk_window_get_application(window));
+
+    // Close the window
+    gtk_window_close(window);
+
+    // Reopen the Main window
+    create_main_window(app);
 }
